@@ -1,4 +1,43 @@
 <x-layouts.app :title="__('Display Management')">
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    <script>
+        function bindingCode() {
+            return {
+                code: ['', '', '', '', '', ''],
+                currentFocus: 0,
+                handleInput(index, event) {
+                    const value = event.target.value.toUpperCase();
+                    if (value.match(/^[A-Z0-9]$/)) {
+                        this.code[index] = value;
+                        if (index < 5) {
+                            this.currentFocus = index + 1;
+                            this.$refs[`code${index + 1}`].focus();
+                        }
+                    }
+                },
+                handleKeydown(index, event) {
+                    if (event.key === 'Backspace' && !this.code[index] && index > 0) {
+                        this.currentFocus = index - 1;
+                        this.$refs[`code${index - 1}`].focus();
+                    }
+                },
+                handlePaste(event) {
+                    event.preventDefault();
+                    const pastedData = event.clipboardData.getData('text').toUpperCase();
+                    const chars = pastedData.match(/[A-Z0-9]/g) || [];
+                    chars.slice(0, 6).forEach((char, index) => {
+                        this.code[index] = char;
+                    });
+                    this.currentFocus = Math.min(chars.length, 5);
+                    if (this.currentFocus < 6) {
+                        this.$refs[`code${this.currentFocus}`].focus();
+                    }
+                }
+            }
+        }
+    </script>
     <div class="flex h-full w-full flex-1 flex-col gap-6">
         <!-- Page Header -->
         <div class="flex items-center justify-between">
@@ -6,9 +45,11 @@
                 <flux:button variant="filled" icon="arrow-path" class="bg-blue-600 hover:bg-blue-700">
                     {{ __('Refresh All') }}
                 </flux:button>
-                <flux:button variant="primary" icon="plus">
-                    {{ __('Add Display') }}
-                </flux:button>
+                <flux:modal.trigger name="add-display-modal">
+                    <flux:button variant="primary" icon="plus">
+                        {{ __('Add Display') }}
+                    </flux:button>
+                </flux:modal.trigger>
             </div>
         </div>
 
@@ -54,32 +95,48 @@
             </div>
         </div>
 
-        <!-- Filters and Search -->
-        <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <flux:input placeholder="Search displays..." class="w-64" icon="magnifying-glass" />
-                <select class="w-40 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
-                    <option value="all">{{ __('All Status') }}</option>
-                    <option value="online">{{ __('Online') }}</option>
-                    <option value="offline">{{ __('Offline') }}</option>
-                    <option value="powered_off">{{ __('Powered Off') }}</option>
-                </select>
-                <select class="w-32 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
-                    <option value="all">{{ __('All Floors') }}</option>
-                    <option value="1">{{ __('Floor 1') }}</option>
-                    <option value="2">{{ __('Floor 2') }}</option>
-                    <option value="3">{{ __('Floor 3') }}</option>
-                    <option value="4">{{ __('Floor 4') }}</option>
-                </select>
+        <!-- View Toggle and Content Container -->
+        <div x-data="{ viewMode: 'table' }">
+            <!-- Filters and Search -->
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <flux:input placeholder="Search displays..." class="w-64" icon="magnifying-glass" />
+                    <select class="w-40 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+                        <option value="all">{{ __('All Status') }}</option>
+                        <option value="online">{{ __('Online') }}</option>
+                        <option value="offline">{{ __('Offline') }}</option>
+                        <option value="powered_off">{{ __('Powered Off') }}</option>
+                    </select>
+                    <select class="w-32 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white">
+                        <option value="all">{{ __('All Floors') }}</option>
+                        <option value="1">{{ __('Floor 1') }}</option>
+                        <option value="2">{{ __('Floor 2') }}</option>
+                        <option value="3">{{ __('Floor 3') }}</option>
+                        <option value="4">{{ __('Floor 4') }}</option>
+                    </select>
+                </div>
+                            <div class="flex items-center gap-2">
+                <button @click="viewMode = 'table'" :class="viewMode === 'table' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                    </svg>
+                    {{ __('Table') }}
+                </button>
+                <button @click="viewMode = 'grid'" :class="viewMode === 'grid' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    {{ __('Grid') }}
+                </button>
             </div>
-            <div class="flex items-center gap-2">
-                <flux:button variant="subtle" icon="view-columns">{{ __('Grid') }}</flux:button>
-                <flux:button variant="filled" icon="bars-3">{{ __('List') }}</flux:button>
             </div>
-        </div>
 
-        <!-- Displays Table -->
-        <div class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+                        <!-- Displays Content -->
+
+
+
+            <!-- Table View -->
+            <div x-show="viewMode === 'table'" class="relative overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
@@ -242,6 +299,146 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Grid View -->
+            <div x-show="viewMode === 'grid'" class="p-6">
+                <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <!-- Display Card 1 -->
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 hover:shadow-md transition-shadow dark:border-neutral-600 dark:bg-neutral-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium">{{ __('Room 301') }}</span>
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Samsung 55" Smart TV') }}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <div class="h-2 w-2 rounded-full bg-green-500"></div>
+                                <span class="text-xs text-green-600 dark:text-green-400">{{ __('Online') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Template:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300">{{ __('Welcome Template') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('IP Address:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300 font-mono">192.168.1.101</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Last Seen:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300">{{ __('2 minutes ago') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <flux:modal.trigger name="display-settings-301">
+                                <button class="flex-1 inline-flex items-center justify-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-neutral-700 bg-neutral-100 hover:bg-neutral-200 dark:text-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600">
+                                    {{ __('Settings') }}
+                                </button>
+                            </flux:modal.trigger>
+                        </div>
+                    </div>
+
+                    <!-- Display Card 2 -->
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 hover:shadow-md transition-shadow dark:border-neutral-600 dark:bg-neutral-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium">{{ __('Room 205') }}</span>
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('LG 43" Smart TV') }}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <div class="h-2 w-2 rounded-full bg-red-500"></div>
+                                <span class="text-xs text-red-600 dark:text-red-400">{{ __('Offline') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Template:') }}</span>
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('No template') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('IP Address:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300 font-mono">192.168.1.105</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Last Seen:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300">{{ __('1 hour ago') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <flux:modal.trigger name="display-settings-205">
+                                <button class="flex-1 inline-flex items-center justify-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-neutral-700 bg-neutral-100 hover:bg-neutral-200 dark:text-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600" disabled>
+                                    {{ __('Settings') }}
+                                </button>
+                            </flux:modal.trigger>
+                        </div>
+                    </div>
+
+                    <!-- Display Card 3 -->
+                    <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 hover:shadow-md transition-shadow dark:border-neutral-600 dark:bg-neutral-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium">{{ __('Lobby Main') }}</span>
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Sony 65" Professional') }}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <div class="h-2 w-2 rounded-full bg-green-500"></div>
+                                <span class="text-xs text-green-600 dark:text-green-400">{{ __('Online') }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Template:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300">{{ __('Hotel Info Template') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('IP Address:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300 font-mono">192.168.1.200</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Last Seen:') }}</span>
+                                <span class="text-xs text-neutral-600 dark:text-neutral-300">{{ __('Just now') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <flux:modal.trigger name="display-settings-lobby">
+                                <button class="flex-1 inline-flex items-center justify-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-neutral-700 bg-neutral-100 hover:bg-neutral-200 dark:text-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600">
+                                    {{ __('Settings') }}
+                                </button>
+                            </flux:modal.trigger>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
         </div>
 
         <!-- Pagination -->
@@ -387,6 +584,85 @@
                 </flux:modal.close>
                 <flux:button variant="primary">{{ __('Save Changes') }}</flux:button>
             </div>
+        </div>
+    </flux:modal>
+
+    <!-- Add Display Modal -->
+    <flux:modal name="add-display-modal" class="max-w-md">
+        <div class="p-6">
+            <div class="mb-6">
+                <flux:heading size="lg">{{ __('Add New Display') }}</flux:heading>
+                <flux:subheading>{{ __('Enter display details and binding code') }}</flux:subheading>
+            </div>
+
+            <form class="space-y-6">
+                <!-- Display Name -->
+                <div>
+                    <flux:field>
+                        <flux:label for="display_name">{{ __('Display Name') }}</flux:label>
+                        <flux:input 
+                            id="display_name" 
+                            name="display_name" 
+                            placeholder="{{ __('e.g., Room 301, Lobby Main') }}"
+                            required
+                        />
+                    </flux:field>
+                </div>
+
+                <!-- Binding Code -->
+                <div>
+                    <flux:field>
+                        <flux:label for="binding_code">{{ __('Binding Code') }}</flux:label>
+                        <flux:subheading class="mb-3">{{ __('Enter the 6-character code from your display device') }}</flux:subheading>
+                        
+                        <div class="flex gap-2 justify-center" x-data="bindingCode()">
+                            <template x-for="(char, index) in code" :key="index">
+                                <input 
+                                    :ref="`code${index}`"
+                                    type="text" 
+                                    maxlength="1"
+                                    class="w-12 h-12 text-center text-lg font-bold border-2 border-neutral-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-900"
+                                    :class="{ 'border-blue-500 bg-blue-50 dark:bg-blue-900/20': char }"
+                                    x-model="code[index]"
+                                    @input="handleInput(index, $event)"
+                                    @keydown="handleKeydown(index, $event)"
+                                    @paste="handlePaste($event)"
+                                    @focus="currentFocus = index"
+                                    placeholder="•"
+                                />
+                            </template>
+                        </div>
+                        
+
+                        
+                        <flux:subheading class="mt-2 text-center text-neutral-500 dark:text-neutral-400">
+                            {{ __('Enter each character in the blocks above') }}
+                        </flux:subheading>
+                    </flux:field>
+                </div>
+
+                <!-- Additional Options -->
+                <div class="space-y-4">
+                    <flux:field>
+                        <flux:label for="location">{{ __('Location') }}</flux:label>
+                        <flux:input 
+                            id="location" 
+                            name="location" 
+                            placeholder="{{ __('e.g., Floor 3, Building A') }}"
+                        />
+                    </flux:field>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+                    <flux:modal.close>
+                        <flux:button variant="subtle">{{ __('Cancel') }}</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" type="submit">
+                        {{ __('Add Display') }}
+                    </flux:button>
+                </div>
+            </form>
         </div>
     </flux:modal>
 </x-layouts.app>

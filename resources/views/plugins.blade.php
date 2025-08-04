@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">{{ __('Plugin Store') }}</h1>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">{{ __('Browse and install plugins to enhance your IPTV system') }}</p>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">{{ __('Browse and install plugins to enhance your hotel and hospital IPTV system') }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <flux:button variant="outline" size="sm">
@@ -25,20 +25,20 @@
 
         <!-- Plugin Grid -->
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <!-- Plugin 1: Analytics Dashboard -->
+            <!-- Plugin 1: Guest Information Portal -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Analytics Dashboard</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Advanced viewer analytics and insights</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Guest Information Portal</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Hotel amenities, services, and local information</p>
                         </div>
                         <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
                     </div>
@@ -54,22 +54,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 2: EPG Manager -->
+            <!-- Plugin 2: Patient Information System -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-green-500 to-teal-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">EPG Manager</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Electronic Program Guide management</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Patient Information System</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Patient care information and updates</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$29</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$49</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -83,22 +83,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 3: Multi-Screen Support -->
+            <!-- Plugin 3: TV Games Suite -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-purple-500 to-pink-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Multi-Screen Support</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Support for multiple displays</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">TV Games Suite</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Interactive games for entertainment</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$29</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -112,22 +112,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 4: Content Filter -->
+            <!-- Plugin 4: Outlook Calendar Integration -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-red-500 to-orange-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Content Filter</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Advanced content filtering system</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Outlook Calendar Integration</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Sync meetings and appointments</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$19</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$39</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -141,20 +141,20 @@
                 </div>
             </div>
 
-            <!-- Plugin 5: Backup Manager -->
+            <!-- Plugin 5: Room Service Menu -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-indigo-500 to-blue-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Backup Manager</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Automated backup and restore</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Room Service Menu</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Digital menu and ordering system</p>
                         </div>
                         <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
                     </div>
@@ -170,22 +170,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 6: User Management -->
+            <!-- Plugin 6: Medical Records Viewer -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-yellow-500 to-orange-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">User Management</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Advanced user roles and permissions</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Medical Records Viewer</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Secure medical records access</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$39</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$79</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -199,22 +199,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 7: Recording Studio -->
+            <!-- Plugin 7: Hotel Concierge -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-pink-500 to-rose-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Recording Studio</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">DVR and recording capabilities</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Hotel Concierge</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">24/7 concierge services and requests</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$49</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$25</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -228,20 +228,20 @@
                 </div>
             </div>
 
-            <!-- Plugin 8: Weather Widget -->
+            <!-- Plugin 8: Emergency Alerts -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-cyan-500 to-blue-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Weather Widget</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Local weather information</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Emergency Alerts</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Critical notifications and alerts</p>
                         </div>
                         <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
                     </div>
@@ -257,20 +257,21 @@
                 </div>
             </div>
 
-            <!-- Plugin 9: Notification Center -->
+            <!-- Plugin 9: Local Attractions Guide -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-emerald-500 to-green-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.19 4.19A2 2 0 006 3h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Notification Center</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">System notifications and alerts</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Local Attractions Guide</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Nearby restaurants, attractions, and events</p>
                         </div>
                         <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
                     </div>
@@ -286,22 +287,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 10: API Gateway -->
+            <!-- Plugin 10: Staff Communication Hub -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-violet-500 to-purple-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">API Gateway</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">RESTful API management</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Staff Communication Hub</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Internal messaging and announcements</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$79</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$35</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -315,22 +316,22 @@
                 </div>
             </div>
 
-            <!-- Plugin 11: Performance Monitor -->
+            <!-- Plugin 11: Billing & Payment Portal -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-amber-500 to-yellow-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Performance Monitor</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">System performance tracking</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Billing & Payment Portal</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Secure billing and payment processing</p>
                         </div>
-                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$25</span>
+                        <span class="ml-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">$59</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between">
                         <div class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -340,24 +341,24 @@
                             4.5 (445)
                         </div>
                         <flux:button size="sm">Install</flux:button>
-                    </div>
-                </div>
+            </div>
+        </div>
             </div>
 
-            <!-- Plugin 12: Custom Themes -->
+            <!-- Plugin 12: Wellness & Entertainment -->
             <div class="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-200 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
                 <div class="aspect-video bg-gradient-to-br from-slate-500 to-gray-600 p-4">
                     <div class="flex h-full items-center justify-center">
                         <svg class="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <h3 class="font-semibold text-neutral-900 dark:text-white">Custom Themes</h3>
-                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Customizable UI themes</p>
+                            <h3 class="font-semibold text-neutral-900 dark:text-white">Wellness & Entertainment</h3>
+                            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Meditation, music, and relaxation content</p>
                         </div>
                         <span class="ml-2 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">Free</span>
                     </div>

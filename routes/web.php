@@ -43,17 +43,21 @@ Route::view('integrations', 'integrations')
     ->middleware(['auth'])
     ->name('integrations');
 
-Route::view('users', 'users')
+Volt::route('users', 'users')
     ->middleware(['auth'])
     ->name('users');
 
-Route::view('roles', 'roles')
+Volt::route('roles', 'roles')
     ->middleware(['auth'])
     ->name('roles');
 
-Route::view('permissions', 'permissions')
+Volt::route('permissions', 'permissions')
     ->middleware(['auth'])
     ->name('permissions');
+
+Volt::route('permission-categories', 'permission-categories')
+    ->middleware(['auth'])
+    ->name('permission-categories');
 
 Route::view('settings', 'settings')
     ->middleware(['auth'])

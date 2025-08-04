@@ -40,7 +40,7 @@
                 </flux:navlist.group>
             </flux:navlist>
 
-            <flux:navlist.group expandable :expanded="false" heading="Administration" class="hidden lg:grid">
+            <flux:navlist.group expandable :expanded="request()->routeIs('users') || request()->routeIs('roles') || request()->routeIs('permissions') || request()->routeIs('integrations')" heading="Administration" class="hidden lg:grid">
                 <flux:navlist.item href="{{ route('users') }}" :current="request()->routeIs('users')">{{ __('Users') }}</flux:navlist.item>
                 <flux:navlist.item href="{{ route('roles') }}" :current="request()->routeIs('roles')">{{ __('Roles') }}</flux:navlist.item>
                 <flux:navlist.item href="{{ route('permissions') }}" :current="request()->routeIs('permissions')">{{ __('Permissions') }}</flux:navlist.item>
@@ -53,7 +53,7 @@
             <flux:navlist variant="outline">
 
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                <flux:navlist.item icon="book-open-text" href="#" target="_blank">
                 {{ __('Documentation') }}
                 </flux:navlist.item>
             </flux:navlist>
