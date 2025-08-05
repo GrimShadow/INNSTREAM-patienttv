@@ -44,7 +44,7 @@
                 <flux:navlist.item href="{{ route('users') }}" :current="request()->routeIs('users')">{{ __('Users') }}</flux:navlist.item>
                 <flux:navlist.item href="{{ route('roles') }}" :current="request()->routeIs('roles')">{{ __('Roles') }}</flux:navlist.item>
                 <flux:navlist.item href="{{ route('permissions') }}" :current="request()->routeIs('permissions')">{{ __('Permissions') }}</flux:navlist.item>
-                <flux:navlist.item href="{{ route('integrations') }}" :current="request()->routeIs('integrations')">{{ __('Integrations') }}</flux:navlist.item>
+                <flux:navlist.item href="{{ route('license') }}" :current="request()->routeIs('license')">{{ __('License') }}</flux:navlist.item>
                 
             </flux:navlist.group>
 

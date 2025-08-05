@@ -1,4 +1,46 @@
-<x-layouts.app :title="__('Reporting & Analytics')">
+<?php
+
+use function Livewire\Volt\{with, layout, title};
+
+layout('components.layouts.app');
+title(__('Reporting & Analytics'));
+
+// Provide data to view
+with(fn () => [
+    'totalDisplays' => 280,
+    'uptime' => 99.2,
+    'activeUsers' => 24,
+    'dataUsage' => '2.4TB',
+    'onlineDisplays' => 247,
+    'offlineDisplays' => 12,
+    'standbyDisplays' => 21,
+    'templateData' => [
+        ['name' => 'Welcome Template', 'count' => 156, 'percentage' => 55.7, 'color' => '#3B82F6'],
+        ['name' => 'Hotel Info', 'count' => 89, 'percentage' => 31.8, 'color' => '#10B981'],
+        ['name' => 'Entertainment', 'count' => 35, 'percentage' => 12.5, 'color' => '#8B5CF6'],
+    ],
+    'systemHealth' => [
+        'cpu' => 23,
+        'memory' => 67,
+        'storage' => 45,
+        'network' => 78,
+    ],
+    'recentActivity' => [
+        ['type' => 'success', 'message' => 'Template updated: Welcome Screen', 'time' => '2 minutes ago by John Doe'],
+        ['type' => 'info', 'message' => 'Display added: Room 402', 'time' => '15 minutes ago by Admin'],
+        ['type' => 'warning', 'message' => 'Display offline: Room 205', 'time' => '1 hour ago - System Alert'],
+        ['type' => 'purple', 'message' => 'User login: Jane Smith', 'time' => '3 hours ago from 192.168.1.45'],
+    ],
+    'recentReports' => [
+        ['name' => 'March 2024 Performance Report', 'type' => 'Performance', 'time' => '2 hours ago', 'size' => '2.4 MB'],
+        ['name' => 'Weekly Usage Analytics', 'type' => 'Usage', 'time' => '1 day ago', 'size' => '1.8 MB'],
+        ['name' => 'System Maintenance Report', 'type' => 'Maintenance', 'time' => '3 days ago', 'size' => '956 KB'],
+    ],
+]);
+
+?>
+
+<div>
     <div class="flex h-full w-full flex-1 flex-col gap-6">
         <!-- Page Header -->
         <div class="flex items-center justify-between">
@@ -22,7 +64,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <flux:subheading class="text-neutral-500 dark:text-neutral-400">{{ __('Total Displays') }}</flux:subheading>
-                        <flux:heading size="2xl" class="mt-2 text-neutral-900 dark:text-neutral-100">280</flux:heading>
+                        <flux:heading size="2xl" class="mt-2 text-neutral-900 dark:text-neutral-100">{{ $totalDisplays }}</flux:heading>
                         <flux:text class="mt-1 text-sm text-green-600 dark:text-green-400">
                             {{ __('↗ +5.2% from last month') }}
                         </flux:text>
@@ -39,7 +81,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <flux:subheading class="text-neutral-500 dark:text-neutral-400">{{ __('Uptime') }}</flux:subheading>
-                        <flux:heading size="2xl" class="mt-2 text-green-600 dark:text-green-400">99.2%</flux:heading>
+                        <flux:heading size="2xl" class="mt-2 text-green-600 dark:text-green-400">{{ $uptime }}%</flux:heading>
                         <flux:text class="mt-1 text-sm text-green-600 dark:text-green-400">
                             {{ __('↗ +0.3% from last week') }}
                         </flux:text>
@@ -56,7 +98,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <flux:subheading class="text-neutral-500 dark:text-neutral-400">{{ __('Active Users') }}</flux:subheading>
-                        <flux:heading size="2xl" class="mt-2 text-purple-600 dark:text-purple-400">24</flux:heading>
+                        <flux:heading size="2xl" class="mt-2 text-purple-600 dark:text-purple-400">{{ $activeUsers }}</flux:heading>
                         <flux:text class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                             {{ __('→ No change') }}
                         </flux:text>
@@ -73,7 +115,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <flux:subheading class="text-neutral-500 dark:text-neutral-400">{{ __('Data Usage') }}</flux:subheading>
-                        <flux:heading size="2xl" class="mt-2 text-orange-600 dark:text-orange-400">2.4TB</flux:heading>
+                        <flux:heading size="2xl" class="mt-2 text-orange-600 dark:text-orange-400">{{ $dataUsage }}</flux:heading>
                         <flux:text class="mt-1 text-sm text-orange-600 dark:text-orange-400">
                             {{ __('↗ +12% from last month') }}
                         </flux:text>
@@ -119,29 +161,19 @@
                     </flux:button>
                 </div>
                 <div class="relative h-64">
-                    <!-- Placeholder for Chart -->
-                    <div class="flex h-full items-center justify-center border-2 border-dashed border-neutral-200 dark:border-neutral-700">
-                        <div class="text-center">
-                            <svg class="mx-auto h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                            <flux:text class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                                {{ __('Chart: Online vs Offline Displays') }}
-                            </flux:text>
-                        </div>
-                    </div>
+                    <canvas id="displayPerformanceChart" width="400" height="200"></canvas>
                 </div>
                 <div class="mt-4 grid grid-cols-3 gap-4">
                     <div class="text-center">
-                        <flux:text class="text-2xl font-bold text-green-600 dark:text-green-400">247</flux:text>
+                        <flux:text class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $onlineDisplays }}</flux:text>
                         <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Online') }}</flux:text>
                     </div>
                     <div class="text-center">
-                        <flux:text class="text-2xl font-bold text-red-600 dark:text-red-400">12</flux:text>
+                        <flux:text class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $offlineDisplays }}</flux:text>
                         <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Offline') }}</flux:text>
                     </div>
                     <div class="text-center">
-                        <flux:text class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">21</flux:text>
+                        <flux:text class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{{ $standbyDisplays }}</flux:text>
                         <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Standby') }}</flux:text>
                     </div>
                 </div>
@@ -156,41 +188,18 @@
                     </flux:button>
                 </div>
                 <div class="relative h-64">
-                    <!-- Placeholder for Pie Chart -->
-                    <div class="flex h-full items-center justify-center border-2 border-dashed border-neutral-200 dark:border-neutral-700">
-                        <div class="text-center">
-                            <svg class="mx-auto h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-                            </svg>
-                            <flux:text class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                                {{ __('Chart: Template Distribution') }}
-                            </flux:text>
-                        </div>
-                    </div>
+                    <canvas id="templateUsageChart" width="400" height="200"></canvas>
                 </div>
                 <div class="mt-4 space-y-2">
+                    @foreach($templateData as $template)
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <div class="h-3 w-3 rounded-full bg-blue-500"></div>
-                            <flux:text class="text-sm">{{ __('Welcome Template') }}</flux:text>
+                            <div class="h-3 w-3 rounded-full" style="background-color: {{ $template['color'] }}"></div>
+                            <flux:text class="text-sm">{{ $template['name'] }}</flux:text>
                         </div>
-                        <flux:text class="text-sm font-medium">156 (55.7%)</flux:text>
+                        <flux:text class="text-sm font-medium">{{ $template['count'] }} ({{ $template['percentage'] }}%)</flux:text>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div class="h-3 w-3 rounded-full bg-green-500"></div>
-                            <flux:text class="text-sm">{{ __('Hotel Info') }}</flux:text>
-                        </div>
-                        <flux:text class="text-sm font-medium">89 (31.8%)</flux:text>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div class="h-3 w-3 rounded-full bg-purple-500"></div>
-                            <flux:text class="text-sm">{{ __('Entertainment') }}</flux:text>
-                        </div>
-                        <flux:text class="text-sm font-medium">35 (12.5%)</flux:text>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -207,10 +216,10 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <flux:text class="text-sm font-medium">{{ __('CPU Usage') }}</flux:text>
-                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">23%</flux:text>
+                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">{{ $systemHealth['cpu'] }}%</flux:text>
                         </div>
                         <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
-                            <div class="bg-green-600 h-2 rounded-full" style="width: 23%"></div>
+                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ $systemHealth['cpu'] }}%"></div>
                         </div>
                     </div>
 
@@ -218,10 +227,10 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <flux:text class="text-sm font-medium">{{ __('Memory Usage') }}</flux:text>
-                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">67%</flux:text>
+                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">{{ $systemHealth['memory'] }}%</flux:text>
                         </div>
                         <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
-                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 67%"></div>
+                            <div class="bg-yellow-600 h-2 rounded-full" style="width: {{ $systemHealth['memory'] }}%"></div>
                         </div>
                     </div>
 
@@ -229,10 +238,10 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <flux:text class="text-sm font-medium">{{ __('Storage Usage') }}</flux:text>
-                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">45%</flux:text>
+                            <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">{{ $systemHealth['storage'] }}%</flux:text>
                         </div>
                         <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: 45%"></div>
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $systemHealth['storage'] }}%"></div>
                         </div>
                     </div>
 
@@ -243,7 +252,7 @@
                             <flux:text class="text-sm text-neutral-500 dark:text-neutral-400">234 Mbps</flux:text>
                         </div>
                         <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
-                            <div class="bg-purple-600 h-2 rounded-full" style="width: 78%"></div>
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: {{ $systemHealth['network'] }}%"></div>
                         </div>
                     </div>
                 </div>
@@ -258,42 +267,27 @@
                     </flux:button>
                 </div>
                 <div class="space-y-3">
+                    @foreach($recentActivity as $activity)
                     <div class="flex items-start space-x-3">
-                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                            <div class="h-2 w-2 rounded-full bg-green-600"></div>
+                        <div class="flex h-6 w-6 items-center justify-center rounded-full 
+                            @if($activity['type'] === 'success') bg-green-100 dark:bg-green-900/20
+                            @elseif($activity['type'] === 'info') bg-blue-100 dark:bg-blue-900/20
+                            @elseif($activity['type'] === 'warning') bg-yellow-100 dark:bg-yellow-900/20
+                            @else bg-purple-100 dark:bg-purple-900/20
+                            @endif">
+                            <div class="h-2 w-2 rounded-full 
+                                @if($activity['type'] === 'success') bg-green-600
+                                @elseif($activity['type'] === 'info') bg-blue-600
+                                @elseif($activity['type'] === 'warning') bg-yellow-600
+                                @else bg-purple-600
+                                @endif"></div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <flux:text class="text-sm">{{ __('Template updated: Welcome Screen') }}</flux:text>
-                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('2 minutes ago by John Doe') }}</flux:text>
+                            <flux:text class="text-sm">{{ $activity['message'] }}</flux:text>
+                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ $activity['time'] }}</flux:text>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-3">
-                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
-                            <div class="h-2 w-2 rounded-full bg-blue-600"></div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <flux:text class="text-sm">{{ __('Display added: Room 402') }}</flux:text>
-                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('15 minutes ago by Admin') }}</flux:text>
-                        </div>
-                    </div>
-                    <div class="flex items-start space-x-3">
-                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                            <div class="h-2 w-2 rounded-full bg-yellow-600"></div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <flux:text class="text-sm">{{ __('Display offline: Room 205') }}</flux:text>
-                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('1 hour ago - System Alert') }}</flux:text>
-                        </div>
-                    </div>
-                    <div class="flex items-start space-x-3">
-                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/20">
-                            <div class="h-2 w-2 rounded-full bg-purple-600"></div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <flux:text class="text-sm">{{ __('User login: Jane Smith') }}</flux:text>
-                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('3 hours ago from 192.168.1.45') }}</flux:text>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -445,18 +439,23 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
+                            @foreach($recentReports as $report)
                             <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm font-medium">{{ __('March 2024 Performance Report') }}</flux:text>
+                                    <flux:text class="text-sm font-medium">{{ $report['name'] }}</flux:text>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200">{{ __('Performance') }}</span>
+                                    <span class="rounded-full 
+                                        @if($report['type'] === 'Performance') bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                        @elseif($report['type'] === 'Usage') bg-green-100 px-2 py-1 text-xs text-green-800 dark:bg-green-900 dark:text-green-200
+                                        @else bg-orange-100 px-2 py-1 text-xs text-orange-800 dark:bg-orange-900 dark:text-orange-200
+                                        @endif">{{ $report['type'] }}</span>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('2 hours ago') }}</flux:text>
+                                    <flux:text class="text-sm">{{ $report['time'] }}</flux:text>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('2.4 MB') }}</flux:text>
+                                    <flux:text class="text-sm">{{ $report['size'] }}</flux:text>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap text-right">
                                     <div class="flex items-center justify-end space-x-2">
@@ -469,58 +468,66 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm font-medium">{{ __('Weekly Usage Analytics') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <span class="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800 dark:bg-green-900 dark:text-green-200">{{ __('Usage') }}</span>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('1 day ago') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('1.8 MB') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-right">
-                                    <div class="flex items-center justify-end space-x-2">
-                                        <flux:button variant="subtle" size="sm" icon="arrow-down-tray">
-                                            {{ __('Download') }}
-                                        </flux:button>
-                                        <flux:button variant="subtle" size="sm" icon="share">
-                                            {{ __('Share') }}
-                                        </flux:button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm font-medium">{{ __('System Maintenance Report') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <span class="rounded-full bg-orange-100 px-2 py-1 text-xs text-orange-800 dark:bg-orange-900 dark:text-orange-200">{{ __('Maintenance') }}</span>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('3 days ago') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <flux:text class="text-sm">{{ __('956 KB') }}</flux:text>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-right">
-                                    <div class="flex items-center justify-end space-x-2">
-                                        <flux:button variant="subtle" size="sm" icon="arrow-down-tray">
-                                            {{ __('Download') }}
-                                        </flux:button>
-                                        <flux:button variant="subtle" size="sm" icon="share">
-                                            {{ __('Share') }}
-                                        </flux:button>
-                                    </div>
-                                </td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-</x-layouts.app>
+
+    <!-- Chart.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Display Performance Chart (Doughnut)
+        const displayCtx = document.getElementById('displayPerformanceChart').getContext('2d');
+        new Chart(displayCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Online', 'Offline', 'Standby'],
+                datasets: [{
+                    data: [{{ $onlineDisplays }}, {{ $offlineDisplays }}, {{ $standbyDisplays }}],
+                    backgroundColor: [
+                        '#10B981',
+                        '#EF4444',
+                        '#F59E0B'
+                    ],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Template Usage Chart (Pie)
+        const templateCtx = document.getElementById('templateUsageChart').getContext('2d');
+        new Chart(templateCtx, {
+            type: 'pie',
+            data: {
+                labels: @json(collect($templateData)->pluck('name')),
+                datasets: [{
+                    data: @json(collect($templateData)->pluck('count')),
+                    backgroundColor: @json(collect($templateData)->pluck('color')),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</div>

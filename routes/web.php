@@ -33,13 +33,13 @@ Route::view('plugins', 'plugins')
     ->middleware(['auth'])
     ->name('plugins');
 
-Route::view('reporting-analytics', 'reporting-analytics')
+Volt::route('reporting-analytics', 'reporting-analytics')
     ->middleware(['auth'])
     ->name('reporting-analytics');
 
-Route::view('integrations', 'integrations')
+Volt::route('license', 'license')
     ->middleware(['auth'])
-    ->name('integrations');
+    ->name('license');
 
 Volt::route('users', 'users')
     ->middleware(['auth'])
