@@ -55,6 +55,7 @@ class DatabaseSeeder extends Seeder
         // Seed permission categories
         $this->call([
             PermissionCategorySeeder::class,
+            TemplateSeeder::class,
         ]);
     }
 }

@@ -17,9 +17,41 @@ Route::view('template-management', 'template-management')
     ->middleware(['auth'])
     ->name('template-management');
 
-Route::view('templates', 'templates')
+Route::get('templates', [App\Http\Controllers\TemplateController::class, 'index'])
     ->middleware(['auth'])
     ->name('templates');
+
+Route::get('templates/{template}', [App\Http\Controllers\TemplateController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('template.show');
+
+Route::get('templates/{template}/preview', [App\Http\Controllers\TemplateController::class, 'preview'])
+    ->middleware(['auth'])
+    ->name('template.preview');
+
+Route::get('templates/{template}/data', [App\Http\Controllers\TemplateController::class, 'getTemplateData'])
+    ->middleware(['auth'])
+    ->name('template.data');
+
+Route::get('templates/{template}/html', [App\Http\Controllers\TemplateController::class, 'getHtml'])
+    ->middleware(['auth'])
+    ->name('template.html');
+
+Route::post('templates', [App\Http\Controllers\TemplateController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('template.store');
+
+Route::put('templates/{template}', [App\Http\Controllers\TemplateController::class, 'update'])
+    ->middleware(['auth'])
+    ->name('template.update');
+
+Route::post('templates/{template}/deploy', [App\Http\Controllers\TemplateController::class, 'deploy'])
+    ->middleware(['auth'])
+    ->name('template.deploy');
+
+Route::get('templates/categories', [App\Http\Controllers\TemplateController::class, 'getCategories'])
+    ->middleware(['auth'])
+    ->name('template.categories');
 
 Route::view('template-ui', 'template-ui')
     ->middleware(['auth'])

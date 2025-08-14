@@ -2,9 +2,11 @@
 
 use App\Models\IptvChannel;
 use Livewire\WithFileUploads;
-use function Livewire\Volt\{state, with, usesFileUploads, rules, layout, title};
+use Livewire\WithPagination;
+use function Livewire\Volt\{state, with, usesFileUploads, usesPagination, rules, layout, title};
 
 usesFileUploads();
+usesPagination();
 layout('components.layouts.app');
 title(__('Channel Management'));
 
@@ -39,18 +41,17 @@ rules([
     'form.status' => 'required|in:active,inactive',
 ]);
 
-// Provide data to view
-with(fn () => [
-    'channels' => IptvChannel::orderBy('channel_number')->get(),
-    'headEnds' => [
-        ['name' => 'Head-End A', 'location' => 'New York, NY', 'channels' => 85, 'status' => 'Online', 'ip' => '10.0.1.100'],
-        ['name' => 'Head-End B', 'location' => 'Los Angeles, CA', 'channels' => 92, 'status' => 'Online', 'ip' => '10.0.2.100'],
-        ['name' => 'Head-End C', 'location' => 'Chicago, IL', 'channels' => 67, 'status' => 'Maintenance', 'ip' => '10.0.3.100'],
-        ['name' => 'Head-End D', 'location' => 'Miami, FL', 'channels' => 54, 'status' => 'Online', 'ip' => '10.0.4.100'],
-        ['name' => 'Head-End E', 'location' => 'Dallas, TX', 'channels' => 73, 'status' => 'Offline', 'ip' => '10.0.5.100'],
-        ['name' => 'Head-End F', 'location' => 'Seattle, WA', 'channels' => 89, 'status' => 'Online', 'ip' => '10.0.6.100'],
-    ]
-]);
+// Computed properties for better performance
+$channels = fn() => IptvChannel::orderBy('channel_number')->paginate($this->viewMode === 'grid' ? 8 : 6);
+
+$headEnds = fn() => [
+    ['name' => 'Head-End A', 'location' => 'New York, NY', 'channels' => 85, 'status' => 'Online', 'ip' => '10.0.1.100'],
+    ['name' => 'Head-End B', 'location' => 'Los Angeles, CA', 'channels' => 92, 'status' => 'Online', 'ip' => '10.0.2.100'],
+    ['name' => 'Head-End C', 'location' => 'Chicago, IL', 'channels' => 67, 'status' => 'Maintenance', 'ip' => '10.0.3.100'],
+    ['name' => 'Head-End D', 'location' => 'Miami, FL', 'channels' => 54, 'status' => 'Online', 'ip' => '10.0.4.100'],
+    ['name' => 'Head-End E', 'location' => 'Dallas, TX', 'channels' => 73, 'status' => 'Offline', 'ip' => '10.0.5.100'],
+    ['name' => 'Head-End F', 'location' => 'Seattle, WA', 'channels' => 89, 'status' => 'Online', 'ip' => '10.0.6.100'],
+];
 
 // Actions
 $openEditModal = function ($channelId) {
@@ -134,6 +135,17 @@ $delete = function ($channelId) {
     $this->dispatch('modal-close', name: 'edit-channel-modal');
 };
 
+// Handle view mode changes and reset pagination
+$setViewMode = function ($mode) {
+    if ($this->viewMode !== $mode) {
+        $this->viewMode = $mode;
+        // Reset to first page when changing view modes
+        $this->resetPage();
+    }
+};
+
+
+
 ?>
 
 <div>
@@ -210,7 +222,7 @@ $delete = function ($channelId) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('Total Channels') }}</p>
-                        <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{{ $channels->count() }}</p>
+                        <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{{ $this->channels()->total() }}</p>
                     </div>
                     <svg class="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V2a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1h2a1 1 0 011 1v2m0 0h10"/>
@@ -221,7 +233,7 @@ $delete = function ($channelId) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ __('Active Channels') }}</p>
-                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $channels->where('status', 'active')->count() }}</p>
+                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ IptvChannel::where('status', 'active')->count() }}</p>
                     </div>
                     <div class="h-2 w-2 rounded-full bg-green-500"></div>
                 </div>
@@ -254,13 +266,13 @@ $delete = function ($channelId) {
                 <input type="text" placeholder="Search channels..." class="w-64 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white" />
             </div>
             <div class="flex items-center gap-2">
-                <button @click="viewMode = 'table'" :class="viewMode === 'table' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
+                <button wire:click="setViewMode('table')" :class="viewMode === 'table' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                     </svg>
                     {{ __('Table') }}
                 </button>
-                <button @click="viewMode = 'grid'" :class="viewMode === 'grid' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
+                <button wire:click="setViewMode('grid')" :class="viewMode === 'grid' ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white text-neutral-700 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'" class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium transition-colors dark:border-neutral-600">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
@@ -279,7 +291,17 @@ $delete = function ($channelId) {
             </div>
             
             <!-- Table View -->
-            <div x-show="viewMode === 'table'" class="overflow-x-auto">
+            <div x-show="viewMode === 'table'" class="overflow-x-auto" wire:loading.class="opacity-50">
+                <!-- Loading overlay -->
+                <div wire:loading class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 dark:bg-neutral-900 dark:bg-opacity-75">
+                    <div class="flex items-center space-x-2">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400">{{ __('Loading...') }}</span>
+                    </div>
+                </div>
                 <table class="w-full">
                     <thead class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
                         <tr>
@@ -301,7 +323,7 @@ $delete = function ($channelId) {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
-                        @foreach($channels as $channel)
+                        @foreach($this->channels() as $channel)
                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -374,12 +396,81 @@ $delete = function ($channelId) {
                         @endforeach
                     </tbody>
                 </table>
+                
+                <!-- Pagination -->
+                @if($this->channels()->hasPages())
+                <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ __('Showing') }} {{ $this->channels()->firstItem() ?? 0 }} {{ __('to') }} {{ $this->channels()->lastItem() ?? 0 }} {{ __('of') }} {{ $this->channels()->total() }} {{ __('results') }}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            @if($this->channels()->onFirstPage())
+                                <button disabled class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-400 bg-white border border-neutral-300 rounded-md cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-600">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                    {{ __('Previous') }}
+                                </button>
+                            @else
+                                <button wire:click="previousPage" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                    {{ __('Previous') }}
+                                </button>
+                            @endif
+
+                            <div class="flex items-center space-x-1">
+                                @foreach($this->channels()->getUrlRange(1, $this->channels()->lastPage()) as $page => $url)
+                                    @if($page == $this->channels()->currentPage())
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md dark:bg-blue-500 dark:border-blue-500">
+                                            {{ $page }}
+                                        </button>
+                                    @else
+                                        <button wire:click="gotoPage({{ $page }})" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                            {{ $page }}
+                                        </button>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            @if($this->channels()->hasMorePages())
+                                <button wire:click="nextPage" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                    {{ __('Next') }}
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            @else
+                                <button disabled class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-400 bg-white border border-neutral-300 rounded-md cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-600">
+                                    {{ __('Next') }}
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Grid View -->
-            <div x-show="viewMode === 'grid'" class="p-6">
+            <div x-show="viewMode === 'grid'" class="p-6" wire:loading.class="opacity-50">
+                <!-- Loading overlay for grid view -->
+                <div wire:loading class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 dark:bg-neutral-900 dark:bg-opacity-75">
+                    <div class="flex items-center space-x-2">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400">{{ __('Loading...') }}</span>
+                    </div>
+                </div>
+                
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    @foreach($channels as $channel)
+                    @foreach($this->channels() as $channel)
                     <div class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 hover:shadow-md transition-shadow dark:border-neutral-600 dark:bg-neutral-800">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-center gap-3">
@@ -424,7 +515,7 @@ $delete = function ($channelId) {
                                 <span class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Stream:') }}</span>
                                 <span class="text-xs text-neutral-600 dark:text-neutral-300 font-mono truncate max-w-32" title="{{ $channel->stream_address }}">{{ $channel->stream_address }}</span>
                             </div>
-</div>
+                        </div>
 
                         <div class="flex gap-2">
                             <flux:modal.trigger name="edit-channel-modal">
@@ -443,6 +534,64 @@ $delete = function ($channelId) {
                     </div>
                     @endforeach
                 </div>
+                
+                <!-- Pagination for Grid View -->
+                @if($this->channels()->hasPages())
+                <div class="mt-6 px-6 py-4 border-t border-neutral-200 dark:border-neutral-700">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ __('Showing') }} {{ $this->channels()->firstItem() ?? 0 }} {{ __('to') }} {{ $this->channels()->lastItem() ?? 0 }} {{ __('of') }} {{ $this->channels()->total() }} {{ __('results') }}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            @if($this->channels()->onFirstPage())
+                                <button disabled class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-400 bg-white border border-neutral-300 rounded-md cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-600">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                    {{ __('Previous') }}
+                                </button>
+                            @else
+                                <button wire:click="previousPage" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                    {{ __('Previous') }}
+                                </button>
+                            @endif
+
+                            <div class="flex items-center space-x-1">
+                                @foreach($this->channels()->getUrlRange(1, $this->channels()->lastPage()) as $page => $url)
+                                    @if($page == $this->channels()->currentPage())
+                                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md dark:bg-blue-500 dark:border-blue-500">
+                                            {{ $page }}
+                                        </button>
+                                    @else
+                                        <button wire:click="gotoPage({{ $page }})" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                            {{ $page }}
+                                        </button>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            @if($this->channels()->hasMorePages())
+                                <button wire:click="nextPage" class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700">
+                                    {{ __('Next') }}
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            @else
+                                <button disabled class="inline-flex items-center px-3 py-2 text-sm font-medium text-neutral-400 bg-white border border-neutral-300 rounded-md cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-600">
+                                    {{ __('Next') }}
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
