@@ -623,7 +623,7 @@
                                                          :style="`transform: rotate(${component.data.rotation || 0}deg);`">
                                                         
                                                         <!-- Digital Clock Styles -->
-                                                        <template x-if="component.data.style && component.data.style.startsWith('digital')">
+                                                        <template x-if="component.data.style.startsWith('digital')">
                                                             <div class="text-center"
                                                                  :style="`
                                                                      background-color: ${component.data.backgroundColor || 'transparent'};
@@ -689,7 +689,7 @@
                                                         </template>
                                                         
                                                         <!-- Analogue Clock Styles -->
-                                                        <template x-if="component.data.style && component.data.style.startsWith('analogue')">
+                                                        <template x-if="component.data.style.startsWith('analogue')">
                                                             <div class="text-center"
                                                                  :style="`
                                                                      background-color: ${component.data.backgroundColor || 'transparent'};
@@ -768,18 +768,6 @@
                                                                              x-text="component.data.date || 'Today'">Today</div>
                                                                     </div>
                                                                 </template>
-                                                            </div>
-                                                        </template>
-                                                        
-                                                        <!-- Default Simple Clock (fallback) -->
-                                                        <template x-if="!component.data.style">
-                                                            <div class="text-center">
-                                                                <div :class="`font-bold text-gray-800 dark:text-gray-200 ${component.data.fontFamily || 'font-sans'}`" 
-                                                                     :style="`font-size: ${component.data.fontSize || 48}px;`" 
-                                                                     x-text="component.data.time || '12:00'">12:00</div>
-                                                                <p :class="`text-gray-600 dark:text-gray-400 ${component.data.fontFamily || 'font-sans'}`" 
-                                                                   :style="`font-size: ${(component.data.fontSize || 48) * 0.3}px;`" 
-                                                                   x-text="component.data.date || 'Today'">Today</p>
                                                             </div>
                                                         </template>
                                                     </div>
@@ -2507,48 +2495,6 @@
                 customWidth: '',
                 customHeight: '',
                 
-                // UI State
-                showComponentLibrary: true,
-                showPropertiesPanel: false,
-                showGuides: true,
-                showGrid: false,
-                snapToGrid: false,
-                gridSize: 20,
-                guideSnapDistance: 10,
-                
-                // Canvas State
-                canvasZoom: 1,
-                canvasOffset: { x: 0, y: 0 },
-                isDragging: false,
-                isResizing: false,
-                resizing: false,
-                dragStartPos: { x: 0, y: 0 },
-                dragStartOffset: { x: 0, y: 0 },
-                
-                // Components and Pages
-                components: [],
-                pages: [],
-                nextId: 1,
-                nextPageId: 1,
-                
-                // Guides
-                guides: {
-                    horizontal: [],
-                    vertical: []
-                },
-                
-                // Mouse tracking
-                mouseX: 0,
-                mouseY: 0,
-                mouseCanvasX: 0,
-                mouseCanvasY: 0,
-                
-                // Drag and drop
-                dragOver: false,
-                
-                // Accordion state
-                openAccordionSection: null,
-                
                 // Resolution presets for hotel TV interfaces
                 resolutionPresets: [
                     { name: 'HD (1920x1080)', width: 1920, height: 1080, type: 'hd' },
@@ -3883,9 +3829,104 @@
                         this.$refs.canvas.style.cursor = 'grab';
                     }
                 },
+                
+                zoomIn() {
+                    this.canvasZoom = Math.min(3, this.canvasZoom * 1.2);
+                },
+                
+                zoomOut() {
+                    this.canvasZoom = Math.max(0.1, this.canvasZoom / 1.2);
+                },
+                
+                fitToPage() {
+                    // Calculate the scale to fit the canvas in the viewport
+                    const container = this.$refs.canvasContainer;
+                    if (container) {
+                        const containerRect = container.getBoundingClientRect();
+                        const rulerPadding = this.showGuides ? 48 : 0; // 24px on each side
+                        const scaleX = (containerRect.width - rulerPadding - 100) / this.canvasWidth;
+                        const scaleY = (containerRect.height - rulerPadding - 100) / this.canvasHeight;
+                        const scale = Math.min(scaleX, scaleY, 1); // Don't scale up beyond 100%
+                        
+                        this.canvasZoom = scale;
+                        this.canvasOffset.x = 0;
+                        this.canvasOffset.y = 0;
+                    }
+                },
+                
+                fitToScreen() {
+                    // Calculate the scale to fill the screen (may crop some content)
+                    const container = this.$refs.canvasContainer;
+                    if (container) {
+                        const containerRect = container.getBoundingClientRect();
+                        const deviceFrameDims = this.getDeviceFrameDimensions();
+                        const rulerPadding = this.showGuides ? 48 : 0; // 24px on each side
+                        
+                        // Calculate zoom to fill the container (may crop some content)
+                        const zoomX = (containerRect.width - rulerPadding) / deviceFrameDims.width;
+                        const zoomY = (containerRect.height - rulerPadding) / deviceFrameDims.height;
+                        const zoom = Math.max(zoomX, zoomY) * 0.95; // 95% to add small margin
+                        
+                        this.canvasZoom = Math.max(0.1, Math.min(zoom, 3)); // Limit zoom between 10% and 300%
+                        this.canvasOffset.x = 0;
+                        this.canvasOffset.y = 0;
+                    }
+                },
+                
+                resetCanvas() {
+                    this.canvasZoom = 1;
+                    this.canvasOffset.x = 0;
+                    this.canvasOffset.y = 0;
+                },
+                
+                // Accordion functionality
+                toggleAccordionSection(section) {
+                    if (this.openAccordionSection === section) {
+                        this.openAccordionSection = null; // Close if already open
+                    } else {
+                        this.openAccordionSection = section; // Open new section, close others
+                    }
+                },
 
-                // ... [rest of the code remains unchanged]
-
+                // Canvas zoom and pan state
+                canvasZoom: 1,
+                canvasOffset: { x: 0, y: 0 },
+                
+                // Grid System
+                showGrid: true,
+                snapToGrid: true,
+                gridSize: 20,
+                
+                // Guide System (Scena-style)
+                showGuides: true,
+                guideSize: 20,
+                guides: {
+                    horizontal: [],
+                    vertical: []
+                },
+                guideColor: 'rgba(0, 123, 255, 0.8)',
+                guideSnapDistance: 10,
+                
+                // Mouse tracking for measurements
+                mouseX: 0,
+                mouseY: 0,
+                mouseCanvasX: 0,
+                mouseCanvasY: 0,
+                
+                // UI state
+                showComponentLibrary: true,
+                showPropertiesPanel: false,
+                showBackgroundPreview: false,
+                
+                // Accordion state for component properties
+                openAccordionSection: 'position', // Default open section
+                
+                // Data
+                pages: [],
+                components: [],
+                nextId: 1,
+                nextPageId: 1,
+                
                 // Clock preset system
                 applyClockPreset(preset) {
                     if (!this.selectedComponent || this.selectedComponent.type !== 'clock') return;
@@ -3924,355 +3965,4 @@
                             backgroundColor: '#1f2937',
                             textColor: '#ffffff',
                             borderColor: '#000000',
-                            borderWidth: 2,
-                            borderRadius: '8px',
-                            padding: 20,
-                            shadow: true,
-                            showSeconds: true,
-                            showDate: true,
-                            showDay: true,
-                            timeFormat: '12h'
-                        },
-                        'digital-elegant': {
-                            style: 'digital-elegant',
-                            backgroundColor: 'transparent',
-                            textColor: '#7c3aed',
-                            borderColor: '#c4b5fd',
-                            borderWidth: 1,
-                            borderRadius: '16px',
-                            padding: 24,
-                            shadow: true,
-                            showSeconds: false,
-                            showDate: true,
-                            showDay: false,
-                            timeFormat: '12h'
-                        },
-                        'analogue-classic': {
-                            style: 'analogue-classic',
-                            backgroundColor: '#fefefe',
-                            textColor: '#1f2937',
-                            borderColor: '#d1d5db',
-                            borderWidth: 2,
-                            borderRadius: '50%',
-                            padding: 20,
-                            shadow: true,
-                            showSeconds: true,
-                            showDate: true,
-                            showDay: false,
-                            timeFormat: '12h'
-                        },
-                        'analogue-minimal': {
-                            style: 'analogue-minimal',
-                            backgroundColor: 'transparent',
-                            textColor: '#6b7280',
-                            borderColor: 'transparent',
-                            borderWidth: 0,
-                            borderRadius: '0px',
-                            padding: 12,
-                            shadow: false,
-                            showSeconds: false,
-                            showDate: true,
-                            showDay: false,
-                            timeFormat: '24h'
-                        },
-                        'analogue-elegant': {
-                            style: 'analogue-elegant',
-                            backgroundColor: 'transparent',
-                            textColor: '#059669',
-                            borderColor: '#10b981',
-                            borderWidth: 1,
-                            borderRadius: '50%',
-                            padding: 16,
-                            shadow: false,
-                            showSeconds: true,
-                            showDate: true,
-                            showDay: false,
-                            timeFormat: '12h'
-                        }
-                    };
-                    
-                    if (presets[preset]) {
-                        Object.assign(this.selectedComponent.data, presets[preset]);
-                    }
-                },
-                
-                // Component Actions
-                duplicateComponent(component) {
-                    const newComponent = {
-                        ...component,
-                        id: this.nextId++,
-                        x: component.x + 20,
-                        y: component.y + 20
-                    };
-                    this.components.push(newComponent);
-                    this.selectComponent(newComponent);
-                },
-                
-                deleteComponent(component) {
-                    const index = this.components.findIndex(c => c.id === component.id);
-                    if (index > -1) {
-                        this.components.splice(index, 1);
-                        if (this.selectedComponent?.id === component.id) {
-                            this.selectedComponent = null;
-                            this.showPropertiesPanel = false;
-                        }
-                    }
-                },
-                
-                // Save Template
-                saveTemplate() {
-                    const templateData = {
-                        name: this.selectedTemplate,
-                        pages: this.pages,
-                        components: this.components
-                    };
-                    
-                    // Here you would send the data to your backend
-                    alert('Template saved successfully!');
-                },
-                
-                // Page Navigation
-                previousPage() {
-                    const currentIndex = this.pages.findIndex(p => p.id === this.selectedPage?.id);
-                    if (currentIndex > 0) {
-                        this.selectPage(this.pages[currentIndex - 1]);
-                    }
-                },
-                
-                nextPage() {
-                    const currentIndex = this.pages.findIndex(p => p.id === this.selectedPage?.id);
-                    if (currentIndex < this.pages.length - 1) {
-                        this.selectPage(this.pages[currentIndex + 1]);
-                    }
-                },
-                
-                canGoToPreviousPage() {
-                    return this.pages.findIndex(p => p.id === this.selectedPage?.id) > 0;
-                },
-                
-                canGoToNextPage() {
-                    return this.pages.findIndex(p => p.id === this.selectedPage?.id) < this.pages.length - 1;
-                },
-                
-                getCurrentPageIndex() {
-                    return this.pages.findIndex(p => p.id === this.selectedPage?.id) + 1;
-                },
-                
-                // Background Image/GIF Library
-                openImageLibrary() {
-                    // This function would typically open a modal or a dedicated image picker
-                    // For now, we'll just simulate a file input change
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (event) => {
-                        const file = event.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                this.selectedPage.background.imageUrl = e.target.result;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    };
-                    input.click();
-                },
-                
-                openGifLibrary() {
-                    // This function would typically open a modal or a dedicated GIF picker
-                    // For now, we'll just simulate a file input change
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/gif';
-                    input.onchange = (event) => {
-                        const file = event.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                this.selectedPage.background.gifUrl = e.target.result;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    };
-                    input.click();
-                },
-                
-                handleImageUpload(event, type) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            if (type === 'image') {
-                                this.selectedPage.background.imageUrl = e.target.result;
-                            } else if (type === 'gif') {
-                                this.selectedPage.background.gifUrl = e.target.result;
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                },
-                
-                getPageBackgroundStyle() {
-                    if (this.selectedPage && this.selectedPage.background) {
-                        const { type, color, imageUrl, gifUrl, gifLoop, gradientStart, gradientEnd, gradientDirection, videoUrl, videoVolume, videoLoop, imagePosition, imageSize } = this.selectedPage.background;
-                        const style = {};
-
-                        if (type === 'color') {
-                            style.backgroundColor = color;
-                        } else if (type === 'image' && imageUrl) {
-                            style.backgroundImage = `url(${imageUrl})`;
-                            style.backgroundSize = imageSize || 'cover';
-                            style.backgroundSize = imageSize || 'cover';
-                            style.backgroundPosition = imagePosition || 'center';
-                            style.backgroundRepeat = 'no-repeat';
-                        } else if (type === 'gif' && gifUrl) {
-                            style.backgroundImage = `url(${gifUrl})`;
-                            style.backgroundSize = 'cover';
-                            style.backgroundPosition = 'center';
-                            style.backgroundRepeat = 'no-repeat';
-                        } else if (type === 'gradient' && gradientStart && gradientEnd) {
-                            style.background = `linear-gradient(${gradientDirection || 'to bottom'}, ${gradientStart}, ${gradientEnd})`;
-                        } else if (type === 'video' && videoUrl) {
-                            // Video background would be handled differently
-                            style.backgroundColor = '#000000';
-                        }
-
-                        return style;
-                    }
-                    return {};
-                },
-                
-                // Utility Functions
-                getIconHtml(component) {
-                    const icon = this.iconLibrary.find(i => i.name === component.data.icon);
-                    return icon ? icon.icon : '';
-                },
-                
-                // Grid snapping
-                snapToGridPosition(x, y) {
-                    if (!this.snapToGrid) return { x, y };
-                    
-                    const snappedX = Math.round(x / this.gridSize) * this.gridSize;
-                    const snappedY = Math.round(y / this.gridSize) * this.gridSize;
-                    
-                    return { x: snappedX, y: snappedY };
-                },
-                
-                // Guide snapping
-                snapToGuidePosition(x, y, width, height) {
-                    if (!this.showGuides) return { x, y };
-                    
-                    let snappedX = x;
-                    let snappedY = y;
-                    
-                    // Snap to vertical guides
-                    this.guides.vertical.forEach(guide => {
-                        const guidePos = guide.position * this.getScaleFactor();
-                        if (Math.abs(x - guidePos) <= this.guideSnapDistance) {
-                            snappedX = guidePos;
-                        }
-                        if (Math.abs((x + width) - guidePos) <= this.guideSnapDistance) {
-                            snappedX = guidePos - width;
-                        }
-                        if (Math.abs((x + width/2) - guidePos) <= this.guideSnapDistance) {
-                            snappedX = guidePos - width/2;
-                        }
-                    });
-                    
-                    // Snap to horizontal guides
-                    this.guides.horizontal.forEach(guide => {
-                        const guidePos = guide.position * this.getScaleFactor();
-                        if (Math.abs(y - guidePos) <= this.guideSnapDistance) {
-                            snappedY = guidePos;
-                        }
-                        if (Math.abs((y + height) - guidePos) <= this.guideSnapDistance) {
-                            snappedY = guidePos - height;
-                        }
-                        if (Math.abs((y + height/2) - guidePos) <= this.guideSnapDistance) {
-                            snappedY = guidePos - height/2;
-                        }
-                        if (Math.abs((y + height/2) - guidePos) <= this.guideSnapDistance) {
-                            snappedY = guidePos - height/2;
-                        }
-                    });
-                    
-                    return { x: snappedX, y: snappedY };
-                },
-                
-                // Mouse tracking
-                trackMouse(event) {
-                    this.mouseX = event.clientX;
-                    this.mouseY = event.clientY;
-                    
-                    const canvasCoords = this.screenToCanvas(event.clientX, event.clientY);
-                    this.mouseCanvasX = canvasCoords.x;
-                    this.mouseCanvasY = canvasCoords.y;
-                },
-                
-                // Canvas zoom and pan
-                handleCanvasZoom(event) {
-                    if (event.ctrlKey || event.metaKey) {
-                        event.preventDefault();
-                        const delta = event.deltaY > 0 ? 0.9 : 1.1;
-                        this.canvasZoom = Math.max(0.1, Math.min(3, this.canvasZoom * delta));
-                    }
-                },
-                
-                zoomIn() {
-                    this.canvasZoom = Math.min(3, this.canvasZoom * 1.2);
-                },
-                
-                zoomOut() {
-                    this.canvasZoom = Math.max(0.1, this.canvasZoom / 1.2);
-                },
-                
-                fitToPage() {
-                    const container = this.$refs.canvasContainer;
-                    if (container) {
-                        const containerRect = container.getBoundingClientRect();
-                        const rulerPadding = this.showGuides ? 48 : 0;
-                        const scaleX = (containerRect.width - rulerPadding - 100) / this.canvasWidth;
-                        const scaleY = (containerRect.height - rulerPadding - 100) / this.canvasHeight;
-                        const scale = Math.min(scaleX, scaleY, 1);
-                        
-                        this.canvasZoom = scale;
-                        this.canvasOffset.x = 0;
-                        this.canvasOffset.y = 0;
-                    }
-                },
-                
-                fitToScreen() {
-                    const container = this.$refs.canvasContainer;
-                    if (container) {
-                        const containerRect = container.getBoundingClientRect();
-                        const deviceFrameDims = this.getDeviceFrameDimensions();
-                        const rulerPadding = this.showGuides ? 48 : 0;
-                        
-                        const zoomX = (containerRect.width - rulerPadding) / deviceFrameDims.width;
-                        const zoomY = (containerRect.height - rulerPadding) / deviceFrameDims.height;
-                        const zoom = Math.max(zoomX, zoomY) * 0.95;
-                        
-                        this.canvasZoom = Math.max(0.1, Math.min(zoom, 3));
-                        this.canvasOffset.x = 0;
-                        this.canvasOffset.y = 0;
-                    }
-                },
-                
-                resetCanvas() {
-                    this.canvasZoom = 1;
-                    this.canvasOffset.x = 0;
-                    this.canvasOffset.y = 0;
-                },
-                
-                // Accordion functionality
-                toggleAccordionSection(section) {
-                    if (this.openAccordionSection === section) {
-                        this.openAccordionSection = null;
-                    } else {
-                        this.openAccordionSection = section;
-                    }
-                }
-            }
-        }
-    </script>
-</x-layouts.app>
+                            borderWidth

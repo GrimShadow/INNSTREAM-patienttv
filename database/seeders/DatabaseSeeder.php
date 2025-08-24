@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionCategorySeeder::class,
             TemplateSeeder::class,
+            DisplaySeeder::class,
         ]);
     }
 }
