@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\TestEvent;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -12,6 +13,16 @@ Volt::route('dashboard', 'dashboard')
 Route::view('display-management', 'display-management')
     ->middleware(['auth'])
     ->name('display-management');
+
+// WebSocket test page (remove in production)
+Route::view('websocket-test', 'websocket-test');
+
+// Test broadcast route (remove in production)
+Route::get('test-broadcast', function () {
+    broadcast(new TestEvent('Test message from server!'));
+
+    return 'Event broadcasted!';
+});
 
 Route::view('template-management', 'template-management')
     ->middleware(['auth'])
@@ -92,6 +103,10 @@ Volt::route('permission-categories', 'permission-categories')
 Route::view('settings', 'settings')
     ->middleware(['auth'])
     ->name('settings');
+
+Route::get('documentation', \App\Livewire\Documentation::class)
+    ->middleware(['auth'])
+    ->name('documentation');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

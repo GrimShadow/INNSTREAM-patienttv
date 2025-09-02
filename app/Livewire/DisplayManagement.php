@@ -4,44 +4,61 @@ namespace App\Livewire;
 
 use App\Models\Display;
 use App\Models\Template;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Rule;
 
 class DisplayManagement extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $statusFilter = 'all';
+
     public $floorFilter = 'all';
+
     public $viewMode = 'table';
 
     // Add Display Form Properties
-                    public $showAddModal = false;
-                public $editingDisplay = null;
-                public $activeTab = 'edit'; // 'edit' or 'actions'
-    
+    public $showAddModal = false;
+
+    public $editingDisplay = null;
+
+    public $activeTab = 'edit'; // 'edit' or 'actions'
+
     public $name = '';
+
     public $make = '';
+
     public $model = '';
+
     public $ip_address = '';
+
     public $mac_address = '';
+
     public $os = '';
+
     public $version = '';
+
     public $firmware_version = '';
+
     public $location = '';
+
     public $floor = '';
+
     public $room = '';
-                    public $template_id = '';
 
-                // Display Control Properties
-                public $volume = 50;
-                public $brightness = 100;
-                public $powerAction = '';
+    public $template_id = '';
 
-                protected function rules()
+    // Display Control Properties
+    public $volume = 50;
+
+    public $brightness = 100;
+
+    public $powerAction = '';
+
+    protected function rules()
     {
         $rules = [
             'name' => 'required|string|max:255',
@@ -52,7 +69,7 @@ class DisplayManagement extends Component
         ];
 
         // Only validate these fields when adding a new display
-        if (!$this->editingDisplay) {
+        if (! $this->editingDisplay) {
             $rules = array_merge($rules, [
                 'make' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
@@ -88,12 +105,12 @@ class DisplayManagement extends Component
         return Display::query()
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('make', 'like', '%' . $this->search . '%')
-                      ->orWhere('model', 'like', '%' . $this->search . '%')
-                      ->orWhere('ip_address', 'like', '%' . $this->search . '%')
-                      ->orWhere('location', 'like', '%' . $this->search . '%')
-                      ->orWhere('room', 'like', '%' . $this->search . '%');
+                    $q->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('make', 'like', '%'.$this->search.'%')
+                        ->orWhere('model', 'like', '%'.$this->search.'%')
+                        ->orWhere('ip_address', 'like', '%'.$this->search.'%')
+                        ->orWhere('location', 'like', '%'.$this->search.'%')
+                        ->orWhere('room', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->statusFilter !== 'all', function ($query) {
@@ -111,8 +128,8 @@ class DisplayManagement extends Component
     public function stats()
     {
         $total = Display::count();
-        $online = Display::where('status', 'online')->count();
-        $offline = Display::where('status', 'offline')->count();
+        $online = Display::where('online', true)->count();
+        $offline = Display::where('online', false)->count();
         $poweredOff = Display::where('status', 'powered_off')->count();
 
         return [
@@ -137,10 +154,29 @@ class DisplayManagement extends Component
 
     public function refreshAll()
     {
-        // This would typically ping all displays to check their status
-        // For now, we'll just refresh the component
+        // Refresh the component to get latest data
         $this->dispatch('$refresh');
         $this->dispatch('notify', ['message' => 'Display status refreshed!', 'type' => 'success']);
+    }
+
+    public function checkDisplayStatus()
+    {
+        // Manually trigger the display status check command
+        try {
+            \Artisan::call('displays:check-status', ['--timeout' => 60]);
+            $output = \Artisan::output();
+
+            $this->dispatch('$refresh');
+            $this->dispatch('notify', [
+                'message' => 'Display status check completed! '.trim($output),
+                'type' => 'success',
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', [
+                'message' => 'Error checking display status: '.$e->getMessage(),
+                'type' => 'error',
+            ]);
+        }
     }
 
     public function toggleDisplayStatus(Display $display)
@@ -152,10 +188,10 @@ class DisplayManagement extends Component
             'online' => $newStatus === 'online',
             'last_seen_at' => $newStatus === 'online' ? now() : $display->last_seen_at,
         ]);
-        
+
         $this->dispatch('notify', [
-            'message' => "Display {$display->name} is now {$newStatus}!", 
-            'type' => 'success'
+            'message' => "Display {$display->name} is now {$newStatus}!",
+            'type' => 'success',
         ]);
     }
 
@@ -174,9 +210,9 @@ class DisplayManagement extends Component
     public function resetForm()
     {
         $this->reset([
-            'name', 'make', 'model', 'ip_address', 'mac_address', 
-            'os', 'version', 'firmware_version', 'location', 
-            'floor', 'room', 'template_id', 'volume', 'brightness', 'powerAction'
+            'name', 'make', 'model', 'ip_address', 'mac_address',
+            'os', 'version', 'firmware_version', 'location',
+            'floor', 'room', 'template_id', 'volume', 'brightness', 'powerAction',
         ]);
         $this->editingDisplay = null;
         $this->activeTab = 'edit';
@@ -196,7 +232,7 @@ class DisplayManagement extends Component
                     'room' => $this->room,
                     'template_id' => $this->template_id ?: null,
                 ];
-                
+
                 $this->editingDisplay->update($editableData);
                 $this->dispatch('notify', ['message' => 'Display updated successfully!', 'type' => 'success']);
             } else {
@@ -217,7 +253,7 @@ class DisplayManagement extends Component
                     'status' => 'offline',
                     'online' => false,
                 ];
-                
+
                 Display::create($data);
                 $this->dispatch('notify', ['message' => 'Display added successfully!', 'type' => 'success']);
             }
@@ -225,7 +261,7 @@ class DisplayManagement extends Component
             $this->hideAddModal();
             $this->resetPage();
         } catch (\Exception $e) {
-            $this->dispatch('notify', ['message' => 'Error saving display: ' . $e->getMessage(), 'type' => 'error']);
+            $this->dispatch('notify', ['message' => 'Error saving display: '.$e->getMessage(), 'type' => 'error']);
         }
     }
 
@@ -265,8 +301,8 @@ class DisplayManagement extends Component
     {
         // In a real application, this would send a command to the display
         $this->dispatch('notify', [
-            'message' => "Volume set to {$this->volume}% for {$display->name}", 
-            'type' => 'success'
+            'message' => "Volume set to {$this->volume}% for {$display->name}",
+            'type' => 'success',
         ]);
     }
 
@@ -274,8 +310,8 @@ class DisplayManagement extends Component
     {
         // In a real application, this would send a command to the display
         $this->dispatch('notify', [
-            'message' => "Brightness set to {$this->brightness}% for {$display->name}", 
-            'type' => 'success'
+            'message' => "Brightness set to {$this->brightness}% for {$display->name}",
+            'type' => 'success',
         ]);
     }
 
@@ -295,9 +331,9 @@ class DisplayManagement extends Component
                 $message = "Restarting {$display->name}";
                 break;
             default:
-                $message = "Invalid power action";
+                $message = 'Invalid power action';
         }
-        
+
         $this->dispatch('notify', ['message' => $message, 'type' => 'success']);
         $this->powerAction = '';
     }

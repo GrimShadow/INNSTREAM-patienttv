@@ -5,6 +5,9 @@
             <flux:button variant="filled" icon="arrow-path" class="bg-blue-600 hover:bg-blue-700" wire:click="refreshAll">
                 {{ __('Refresh All') }}
             </flux:button>
+            <flux:button variant="outline" icon="heart" class="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/20" wire:click="checkDisplayStatus">
+                {{ __('Check Status') }}
+            </flux:button>
             <flux:button variant="primary" icon="plus" wire:click="showAddModal">
                 {{ __('Add Display') }}
             </flux:button>
@@ -165,17 +168,18 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center space-x-2">
-                                        <div class="h-2 w-2 rounded-full {{ $display->status === 'online' ? 'bg-green-500' : ($display->status === 'offline' ? 'bg-red-500' : 'bg-yellow-500') }}"></div>
-                                        <flux:text class="text-sm {{ $display->status === 'online' ? 'text-green-600 dark:text-green-400' : ($display->status === 'offline' ? 'text-red-600 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400') }}">
-                                            {{ ucfirst($display->status) }}
+                                        <div class="h-2 w-2 rounded-full {{ $display->online ? 'bg-green-500' : 'bg-red-500' }}"></div>
+                                        <flux:text class="text-sm {{ $display->online ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                            {{ $display->online ? __('Online') : __('Offline') }}
                                         </flux:text>
                                     </div>
-                                    <div class="flex items-center space-x-2 mt-1">
-                                        <div class="h-2 w-2 rounded-full {{ $display->online ? 'bg-green-500' : 'bg-neutral-400' }}"></div>
-                                        <flux:text class="text-xs {{ $display->online ? 'text-green-600 dark:text-green-400' : 'text-neutral-500 dark:text-neutral-400' }}">
-                                            {{ $display->online ? __('Connected') : __('Disconnected') }}
-                                        </flux:text>
-                                    </div>
+                                    @if($display->connection_code)
+                                        <div class="mt-1">
+                                            <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">
+                                                Code: <span class="font-mono font-bold">{{ $display->connection_code }}</span>
+                                            </flux:text>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($display->template)
@@ -259,14 +263,22 @@
                                 </flux:text>
                             </div>
                         </div>
-                        <div class="h-3 w-3 rounded-full {{ $display->status === 'online' ? 'bg-green-500' : ($display->status === 'offline' ? 'bg-red-500' : 'bg-yellow-500') }}"></div>
+                        <div class="h-3 w-3 rounded-full {{ $display->online ? 'bg-green-500' : 'bg-red-500' }}"></div>
                     </div>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Status') }}</flux:text>
-                            <flux:text class="text-xs font-medium">{{ ucfirst($display->status) }}</flux:text>
+                            <flux:text class="text-xs font-medium {{ $display->online ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                {{ $display->online ? __('Online') : __('Offline') }}
+                            </flux:text>
                         </div>
+                        @if($display->connection_code)
+                            <div class="flex justify-between">
+                                <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Connection Code') }}</flux:text>
+                                <flux:text class="text-xs font-mono font-bold">{{ $display->connection_code }}</flux:text>
+                            </div>
+                        @endif
                         <div class="flex justify-between">
                             <flux:text class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('Location') }}</flux:text>
                             <flux:text class="text-xs font-medium">{{ $display->location ?? __('N/A') }}</flux:text>

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Display extends Model
 {
     protected $fillable = [
+        'connection_code',
         'name',
         'make',
         'model',

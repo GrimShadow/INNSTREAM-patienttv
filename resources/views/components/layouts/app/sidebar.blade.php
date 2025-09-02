@@ -53,7 +53,7 @@
             <flux:navlist variant="outline">
 
 
-                <flux:navlist.item icon="book-open-text" href="#" target="_blank">
+                <flux:navlist.item icon="book-open-text" href="{{ route('documentation') }}" target="_blank">
                 {{ __('Documentation') }}
                 </flux:navlist.item>
             </flux:navlist>
