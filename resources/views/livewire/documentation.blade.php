@@ -2,9 +2,8 @@
     <!-- Left Sidebar - Categories (Fixed) -->
     <div class="w-72 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col shadow-sm">
                         <div class="p-6 flex-shrink-0">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-bold text-gray-900">Documentation</h2>
-                        <p class="text-sm text-gray-600 mt-1">Learn how to use INNSTREAM Patient TV</p>
+                    <div class="me-5 flex items-center space-x-2 rtl:space-x-reverse">
+                        <x-app-logo />
                     </div>
                     
                     <!-- Search Bar -->
@@ -415,7 +414,8 @@ html {
                 const tocLinks = document.querySelectorAll('.toc-link');
                 
                 // Try multiple possible scroll containers - target the main content area
-                let scrollContainer = document.querySelector('.flex-1.px-6.py-8.overflow-y-auto') ||
+                let scrollContainer = document.querySelector('.flex-1.px-8.py-8.overflow-y-auto') ||
+                                    document.querySelector('.flex-1.px-6.py-8.overflow-y-auto') ||
                                     document.querySelector('.flex-1.overflow-y-auto') ||
                                     document.querySelector('.overflow-y-auto') ||
                                     document.querySelector('[class*="overflow-y-auto"]') ||
@@ -474,7 +474,8 @@ html {
             };
             
             // Try multiple scroll containers - target the main content area
-            const scrollContainer = document.querySelector('.flex-1.px-6.py-8.overflow-y-auto') ||
+            const scrollContainer = document.querySelector('.flex-1.px-8.py-8.overflow-y-auto') ||
+                                  document.querySelector('.flex-1.px-6.py-8.overflow-y-auto') ||
                                   document.querySelector('.flex-1.overflow-y-auto') ||
                                   document.querySelector('.overflow-y-auto') || 
                                   document.querySelector('[class*="overflow-y-auto"]') ||
