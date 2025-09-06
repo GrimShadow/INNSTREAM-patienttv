@@ -22,18 +22,3 @@ Broadcast::channel('displays', function ($user = null) {
     // Allow public access to displays channel for device connections
     return true;
 });
-
-// Listen for client events on the displays channel
-Broadcast::channel('displays', function ($user = null) {
-    // Process client events when they occur
-    $this->processClientEvents();
-
-    return true;
-});
-
-// Process client events from the displays channel
-function processClientEvents()
-{
-    // This function will be called when events occur on the displays channel
-    // We'll handle the client-device-info events here
-}
