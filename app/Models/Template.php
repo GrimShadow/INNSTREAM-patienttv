@@ -19,6 +19,8 @@ class Template extends Model
         'category',
         'thumbnail_path',
         'html_file_path',
+        'css_file_path',
+        'js_file_path',
         'configuration',
         'components',
         'styles',
@@ -48,9 +50,29 @@ class Template extends Model
     /**
      * Get the user who created this template.
      */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user who last updated this template.
+     */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the thumbnail URL for this template.
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if ($this->thumbnail_path && Storage::disk('public')->exists($this->thumbnail_path)) {
+            return Storage::disk('public')->url($this->thumbnail_path);
+        }
+        
+        return null;
     }
 
     /**
@@ -108,6 +130,72 @@ class Template extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Save the CSS content to a file.
+     */
+    public function saveCssContent(string $cssContent, string $originalFilename = null): bool
+    {
+        $directory = 'templates/' . $this->id;
+        $filename = $originalFilename ?: 'styles.css';
+        $path = $directory . '/' . $filename;
+
+        // Ensure directory exists
+        Storage::makeDirectory($directory);
+
+        // Save the CSS content
+        if (Storage::put($path, $cssContent)) {
+            $this->update(['css_file_path' => $path]);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Save the JS content to a file.
+     */
+    public function saveJsContent(string $jsContent, string $originalFilename = null): bool
+    {
+        $directory = 'templates/' . $this->id;
+        $filename = $originalFilename ?: 'script.js';
+        $path = $directory . '/' . $filename;
+
+        // Ensure directory exists
+        Storage::makeDirectory($directory);
+
+        // Save the JS content
+        if (Storage::put($path, $jsContent)) {
+            $this->update(['js_file_path' => $path]);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the CSS content of the template.
+     */
+    public function getCssContent(): string
+    {
+        if (!$this->css_file_path || !Storage::exists($this->css_file_path)) {
+            return '';
+        }
+
+        return Storage::get($this->css_file_path);
+    }
+
+    /**
+     * Get the JS content of the template.
+     */
+    public function getJsContent(): string
+    {
+        if (!$this->js_file_path || !Storage::exists($this->js_file_path)) {
+            return '';
+        }
+
+        return Storage::get($this->js_file_path);
     }
 
     /**
@@ -211,7 +299,7 @@ class Template extends Model
             'styles' => $this->styles,
             'scripts' => $this->scripts,
             'changelog' => $changelog,
-            'created_by' => auth()->id(),
+            'created_by' => auth()->user()?->id,
         ]);
     }
 
@@ -224,7 +312,7 @@ class Template extends Model
             'display_id' => $displayId,
             'status' => 'pending',
             'deployment_config' => $config,
-            'deployed_by' => auth()->id(),
+            'deployed_by' => auth()->user()?->id,
         ]);
 
         // Increment usage count

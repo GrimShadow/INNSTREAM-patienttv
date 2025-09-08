@@ -24,7 +24,7 @@ Route::get('test-broadcast', function () {
     return 'Event broadcasted!';
 });
 
-Route::view('template-management', 'template-management')
+Route::get('template-management', [App\Http\Controllers\TemplateController::class, 'management'])
     ->middleware(['auth'])
     ->name('template-management');
 
@@ -32,12 +32,28 @@ Route::get('templates', [App\Http\Controllers\TemplateController::class, 'index'
     ->middleware(['auth'])
     ->name('templates');
 
+Route::post('templates/deploy', [App\Http\Controllers\TemplateController::class, 'deploy'])
+    ->middleware(['auth'])
+    ->name('templates.deploy');
+
+Route::delete('templates/deployments/{deployment}/remove', [App\Http\Controllers\TemplateController::class, 'remove'])
+    ->middleware(['auth'])
+    ->name('templates.deployments.remove');
+
+// Specific routes must come before parameterized routes
+Route::post('templates/upload', [App\Http\Controllers\TemplateController::class, 'upload'])
+    ->middleware(['auth'])
+    ->name('template.upload');
+
+Route::post('templates', [App\Http\Controllers\TemplateController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('template.store');
+
 Route::get('templates/{template}', [App\Http\Controllers\TemplateController::class, 'show'])
     ->middleware(['auth'])
     ->name('template.show');
 
 Route::get('templates/{template}/preview', [App\Http\Controllers\TemplateController::class, 'preview'])
-    ->middleware(['auth'])
     ->name('template.preview');
 
 Route::get('templates/{template}/data', [App\Http\Controllers\TemplateController::class, 'getTemplateData'])
@@ -48,13 +64,23 @@ Route::get('templates/{template}/html', [App\Http\Controllers\TemplateController
     ->middleware(['auth'])
     ->name('template.html');
 
-Route::post('templates', [App\Http\Controllers\TemplateController::class, 'store'])
-    ->middleware(['auth'])
-    ->name('template.store');
+Route::get('templates/{template}/css', [App\Http\Controllers\TemplateController::class, 'getCss'])
+    ->name('template.css');
+
+Route::get('templates/{template}/js', [App\Http\Controllers\TemplateController::class, 'getJs'])
+    ->name('template.js');
+
+Route::get('templates/{template}/assets/{path?}', [App\Http\Controllers\TemplateController::class, 'assets'])
+    ->where('path', '.*')
+    ->name('template.assets');
 
 Route::put('templates/{template}', [App\Http\Controllers\TemplateController::class, 'update'])
     ->middleware(['auth'])
     ->name('template.update');
+
+Route::delete('templates/{template}', [App\Http\Controllers\TemplateController::class, 'destroy'])
+    ->middleware(['auth'])
+    ->name('template.destroy');
 
 Route::post('templates/{template}/deploy', [App\Http\Controllers\TemplateController::class, 'deploy'])
     ->middleware(['auth'])

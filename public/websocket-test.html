@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Template Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.connected {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .template-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .template-info h3 {
+            margin: 0 0 10px 0;
+            color: #0066cc;
+        }
+        .template-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Template Test</h1>
+    <p>This page simulates a display connecting via WebSocket and checking for templates.</p>
+
+    <div class="container">
+        <h2>Display Configuration</h2>
+        <div class="form-group">
+            <label for="displayId">Display ID:</label>
+            <input type="number" id="displayId" value="9" placeholder="Enter display ID">
+        </div>
+        <div class="form-group">
+            <label for="connectionCode">Connection Code:</label>
+            <input type="text" id="connectionCode" value="7241S" placeholder="Enter connection code">
+        </div>
+        <div class="form-group">
+            <label for="serverUrl">Server URL:</label>
+            <input type="text" id="serverUrl" value="http://innstream-patienttv.test" placeholder="Enter server URL">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>WebSocket Connection</h2>
+        <div id="connectionStatus" class="status disconnected">Disconnected</div>
+        <button id="connectBtn" onclick="connect()">Connect</button>
+        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+        <button id="heartbeatBtn" onclick="sendHeartbeat()" disabled>Send Heartbeat</button>
+        <button id="checkTemplateBtn" onclick="checkTemplate()" disabled>Check Template</button>
+    </div>
+
+    <div class="container">
+        <h2>Template Information</h2>
+        <div id="templateInfo" class="template-info" style="display: none;">
+            <h3>Active Template</h3>
+            <p><strong>Name:</strong> <span id="templateName"></span></p>
+            <p><strong>Description:</strong> <span id="templateDescription"></span></p>
+            <p><strong>Category:</strong> <span id="templateCategory"></span></p>
+            <p><strong>Version:</strong> <span id="templateVersion"></span></p>
+            <p><strong>Preview URL:</strong> <a id="templatePreviewUrl" href="#" target="_blank">View Preview</a></p>
+        </div>
+        <div id="noTemplate" class="template-info" style="display: none;">
+            <h3>No Active Template</h3>
+            <p>This display does not have an active template assigned.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>WebSocket Messages</h2>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="messageLog" class="log"></div>
+    </div>
+
+    <script>
+        let socket = null;
+        let isConnected = false;
+        let heartbeatInterval = null;
+
+        function log(message) {
+            const logElement = document.getElementById('messageLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const statusElement = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const heartbeatBtn = document.getElementById('heartbeatBtn');
+            const checkTemplateBtn = document.getElementById('checkTemplateBtn');
+
+            if (connected) {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'status connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                heartbeatBtn.disabled = false;
+                checkTemplateBtn.disabled = false;
+            } else {
+                statusElement.textContent = 'Disconnected';
+                statusElement.className = 'status disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                heartbeatBtn.disabled = true;
+                checkTemplateBtn.disabled = true;
+                
+                if (heartbeatInterval) {
+                    clearInterval(heartbeatInterval);
+                    heartbeatInterval = null;
+                }
+            }
+        }
+
+        function connect() {
+            const displayId = document.getElementById('displayId').value;
+            const connectionCode = document.getElementById('connectionCode').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!displayId && !connectionCode) {
+                alert('Please enter either Display ID or Connection Code');
+                return;
+            }
+
+            log('Connecting to WebSocket...');
+
+            // Simulate WebSocket connection by making HTTP requests
+            // In a real implementation, this would use actual WebSocket
+            const connectData = {
+                display_id: displayId || null,
+                connection_code: connectionCode || null,
+                device_info: {
+                    name: 'Test Display',
+                    os: 'Tizen',
+                    app_version: '1.0.0',
+                    mac_address: '00:11:22:33:44:55'
+                }
+            };
+
+            fetch(`${serverUrl}/api/websocket/display/connect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(connectData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log(`Connected successfully: ${JSON.stringify(data.data)}`);
+                    updateConnectionStatus(true);
+                    
+                    // Check for template immediately after connection
+                    setTimeout(() => {
+                        checkTemplate();
+                    }, 1000);
+                    
+                    // Start heartbeat
+                    startHeartbeat();
+                } else {
+                    log(`Connection failed: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                log(`Connection error: ${error.message}`);
+            });
+        }
+
+        function disconnect() {
+            const connectionCode = document.getElementById('connectionCode').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!connectionCode) {
+                alert('Connection code is required for disconnection');
+                return;
+            }
+
+            log('Disconnecting...');
+
+            fetch(`${serverUrl}/api/websocket/display/disconnect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    connection_code: connectionCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log('Disconnected successfully');
+                } else {
+                    log(`Disconnection failed: ${data.message}`);
+                }
+                updateConnectionStatus(false);
+            })
+            .catch(error => {
+                log(`Disconnection error: ${error.message}`);
+                updateConnectionStatus(false);
+            });
+        }
+
+        function sendHeartbeat() {
+            const displayId = document.getElementById('displayId').value;
+            const connectionCode = document.getElementById('connectionCode').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            const heartbeatData = {
+                display_id: displayId || null,
+                connection_code: connectionCode || null
+            };
+
+            fetch(`${serverUrl}/api/websocket/display/heartbeat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(heartbeatData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log('Heartbeat sent successfully');
+                } else {
+                    log(`Heartbeat failed: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                log(`Heartbeat error: ${error.message}`);
+            });
+        }
+
+        function checkTemplate() {
+            const displayId = document.getElementById('displayId').value;
+            const connectionCode = document.getElementById('connectionCode').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            log('Checking for template...');
+
+            const checkData = {
+                display_id: displayId || null,
+                connection_code: connectionCode || null
+            };
+
+            fetch(`${serverUrl}/api/websocket/display/check-template`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log(`Template check response: ${JSON.stringify(data, null, 2)}`);
+                    
+                    if (data.has_template) {
+                        showTemplateInfo(data.template);
+                    } else {
+                        showNoTemplate();
+                    }
+                } else {
+                    log(`Template check failed: ${data.message}`);
+                    showNoTemplate();
+                }
+            })
+            .catch(error => {
+                log(`Template check error: ${error.message}`);
+                showNoTemplate();
+            });
+        }
+
+        function showTemplateInfo(template) {
+            document.getElementById('templateName').textContent = template.name;
+            document.getElementById('templateDescription').textContent = template.description || 'No description';
+            document.getElementById('templateCategory').textContent = template.category || 'Unknown';
+            document.getElementById('templateVersion').textContent = template.version || '1.0.0';
+            document.getElementById('templatePreviewUrl').href = template.preview_url;
+            
+            document.getElementById('templateInfo').style.display = 'block';
+            document.getElementById('noTemplate').style.display = 'none';
+        }
+
+        function showNoTemplate() {
+            document.getElementById('templateInfo').style.display = 'none';
+            document.getElementById('noTemplate').style.display = 'block';
+        }
+
+        function startHeartbeat() {
+            // Send heartbeat every 30 seconds
+            heartbeatInterval = setInterval(() => {
+                if (isConnected) {
+                    sendHeartbeat();
+                }
+            }, 30000);
+        }
+
+        function clearLog() {
+            document.getElementById('messageLog').textContent = '';
+        }
+
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            log('WebSocket Template Test loaded');
+            log('Click "Connect" to start the test');
+        });
+    </script>
+</body>
+</html>

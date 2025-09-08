@@ -43,12 +43,44 @@ class DisplayConnected implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        return [
+        $data = [
             'type' => 'good_day',
             'code' => $this->connectionCode,
             'display_id' => $this->display->id,
             'message' => 'Display connected successfully',
         ];
+
+        // Include template information if display has an active template
+        if ($this->display->template_id) {
+            $template = $this->display->template;
+            if ($template && $template->status === 'published') {
+                $data['template'] = [
+                    'id' => $template->id,
+                    'name' => $template->name,
+                    'description' => $template->description,
+                    'category' => $template->category,
+                    'type' => $template->type,
+                    'version' => $template->version,
+                    'configuration' => $template->configuration,
+                    'tags' => $template->tags,
+                    'compatibility' => $template->compatibility,
+                    'preview_url' => route('template.preview', $template->id),
+                    'css_url' => route('template.css', $template->id),
+                    'js_url' => route('template.js', $template->id),
+                    'assets_url' => route('template.assets', $template->id),
+                    'thumbnail_url' => $template->thumbnail_url,
+                ];
+                $data['has_template'] = true;
+            } else {
+                $data['has_template'] = false;
+                $data['message'] = 'Display connected - no active template';
+            }
+        } else {
+            $data['has_template'] = false;
+            $data['message'] = 'Display connected - no template assigned';
+        }
+
+        return $data;
     }
 
     /**

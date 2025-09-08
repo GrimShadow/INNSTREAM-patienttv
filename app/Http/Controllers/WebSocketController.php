@@ -291,6 +291,138 @@ class WebSocketController extends Controller
     }
 
     /**
+     * Handle template check request from display
+     */
+    public function checkTemplate(Request $request)
+    {
+        try {
+            $connectionCode = $request->input('connection_code');
+            $displayId = $request->input('display_id');
+
+            if (!$connectionCode && !$displayId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Connection code or display ID is required',
+                ], 400);
+            }
+
+            // Find display by connection code or display ID
+            $display = null;
+            if ($connectionCode) {
+                $display = Display::where('connection_code', $connectionCode)->first();
+            } elseif ($displayId) {
+                $display = Display::find($displayId);
+            }
+
+            if (!$display) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Display not found',
+                ], 404);
+            }
+
+            // Update display's last seen timestamp
+            $display->update(['last_seen_at' => now()]);
+
+            // Check if display has an active template
+            if (!$display->template_id) {
+                return response()->json([
+                    'success' => true,
+                    'has_template' => false,
+                    'message' => 'No active template for this display',
+                    'display' => [
+                        'id' => $display->id,
+                        'name' => $display->name,
+                        'connection_code' => $display->connection_code,
+                        'online' => $display->online,
+                    ],
+                ]);
+            }
+
+            // Get the template with all necessary data
+            $template = $display->template;
+            
+            if (!$template) {
+                // Template was deleted, clear it from display
+                $display->update(['template_id' => null]);
+                
+                return response()->json([
+                    'success' => true,
+                    'has_template' => false,
+                    'message' => 'Template no longer exists, cleared from display',
+                    'display' => [
+                        'id' => $display->id,
+                        'name' => $display->name,
+                        'connection_code' => $display->connection_code,
+                        'online' => $display->online,
+                    ],
+                ]);
+            }
+
+            // Check if template is published
+            if ($template->status !== 'published') {
+                return response()->json([
+                    'success' => true,
+                    'has_template' => false,
+                    'message' => 'Template is not published',
+                    'display' => [
+                        'id' => $display->id,
+                        'name' => $display->name,
+                        'connection_code' => $display->connection_code,
+                        'online' => $display->online,
+                    ],
+                ]);
+            }
+
+            // Return template data
+            return response()->json([
+                'success' => true,
+                'has_template' => true,
+                'template' => [
+                    'id' => $template->id,
+                    'name' => $template->name,
+                    'description' => $template->description,
+                    'category' => $template->category,
+                    'type' => $template->type,
+                    'version' => $template->version,
+                    'configuration' => $template->configuration,
+                    'tags' => $template->tags,
+                    'compatibility' => $template->compatibility,
+                    'preview_url' => route('template.preview', $template->id),
+                    'css_url' => route('template.css', $template->id),
+                    'js_url' => route('template.js', $template->id),
+                    'assets_url' => route('template.assets', $template->id),
+                    'thumbnail_url' => $template->thumbnail_url,
+                ],
+                'display' => [
+                    'id' => $display->id,
+                    'name' => $display->name,
+                    'connection_code' => $display->connection_code,
+                    'online' => $display->online,
+                    'template_id' => $display->template_id,
+                ],
+                'deployment' => [
+                    'deployed_at' => $display->updated_at->toISOString(),
+                    'last_checked' => now()->toISOString(),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('WebSocket template check failed', [
+                'error' => $e->getMessage(),
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Template check failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Generate a unique 5-character alphanumeric connection code
      */
     private function generateUniqueConnectionCode(): string

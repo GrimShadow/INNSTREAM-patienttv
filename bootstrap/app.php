@@ -13,9 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Add CORS middleware for API routes
-        $middleware->api(append: [
-            \App\Http\Middleware\CorsMiddleware::class,
+        // Add CORS middleware globally for all routes
+        $middleware->append(\App\Http\Middleware\CorsMiddleware::class);
+        
+        // Add large upload handling middleware for template uploads
+        $middleware->web(append: [
+            \App\Http\Middleware\HandleLargeUploads::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
