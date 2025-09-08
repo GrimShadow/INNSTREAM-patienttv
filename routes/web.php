@@ -17,6 +17,16 @@ Route::view('display-management', 'display-management')
 // WebSocket test page (remove in production)
 Route::view('websocket-test', 'websocket-test');
 
+// Tizen app endpoint - public access for displays
+Route::get('apps/tizen', [App\Http\Controllers\TemplateController::class, 'tizenApp'])
+    ->name('apps.tizen');
+
+// Individual Tizen files - PADS365 structure
+Route::get('apps/tizen/INNSTREAM.wgt', [App\Http\Controllers\TemplateController::class, 'tizenViewer'])
+    ->name('tizen.viewer');
+Route::get('apps/tizen/sssp_config.xml', [App\Http\Controllers\TemplateController::class, 'tizenConfig'])
+    ->name('tizen.config');
+
 // Test broadcast route (remove in production)
 Route::get('test-broadcast', function () {
     broadcast(new TestEvent('Test message from server!'));

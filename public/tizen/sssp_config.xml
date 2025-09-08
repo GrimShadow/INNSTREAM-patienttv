@@ -1,0 +1,9 @@
+<widget>
+<ver>0.2.10</ver>
+<size>1420</size>
+<widgetname>INNSTREAM</widgetname>
+<webtype>tizen</webtype>
+<server>http://innstream-patienttv.test</server>
+<app_url>http://innstream-patienttv.test/apps/tizen/INNSTREAM.wgt</app_url>
+<config_url>http://innstream-patienttv.test/apps/tizen/sssp_config.xml</config_url>
+</widget>

@@ -628,7 +628,7 @@ class TemplateController extends Controller
     {
         try {
             Log::info('Template deployment started', [
-                'user_id' => auth()->id(),
+                'user_id' => auth()->user()?->id,
                 'request_data' => $request->all(),
             ]);
 
@@ -771,7 +771,7 @@ class TemplateController extends Controller
                 'deployment_id' => $deployment->id,
                 'template_id' => $deployment->template_id,
                 'display_id' => $deployment->display_id,
-                'removed_by' => auth()->id(),
+                'removed_by' => auth()->user()?->id,
             ]);
 
             return response()->json([
@@ -923,5 +923,110 @@ class TemplateController extends Controller
 
             return response()->json(['error' => 'Internal server error'], 500);
         }
+    }
+
+    /**
+     * Serve the Tizen widget package and configuration files for displays to download.
+     */
+    public function tizenApp()
+    {
+        $tizenDir = public_path('tizen');
+        
+        // Check if tizen directory exists
+        if (!is_dir($tizenDir)) {
+            return response()->json([
+                'error' => 'Tizen directory not found',
+                'message' => 'Please ensure the tizen directory exists in the public folder with INNSTREAM.wgt and sssp_config.xml files'
+            ], 404);
+        }
+
+        $viewerWgtPath = $tizenDir . '/INNSTREAM.wgt';
+        $configXmlPath = $tizenDir . '/sssp_config.xml';
+        
+        // Check if both required files exist
+        if (!file_exists($viewerWgtPath) || !file_exists($configXmlPath)) {
+            return response()->json([
+                'error' => 'Required Tizen files not found',
+                'message' => 'Please ensure both INNSTREAM.wgt and sssp_config.xml are in the public/tizen directory',
+                'missing_files' => [
+                    'INNSTREAM.wgt' => !file_exists($viewerWgtPath),
+                    'sssp_config.xml' => !file_exists($configXmlPath)
+                ]
+            ], 404);
+        }
+
+        // Return directory listing with both files
+        $files = [
+            [
+                'name' => 'INNSTREAM.wgt',
+                'size' => filesize($viewerWgtPath),
+                'last_modified' => date('d/m/Y H:i:s', filemtime($viewerWgtPath)),
+                'url' => url('apps/tizen/INNSTREAM.wgt')
+            ],
+            [
+                'name' => 'sssp_config.xml',
+                'size' => filesize($configXmlPath),
+                'last_modified' => date('d/m/Y H:i:s', filemtime($configXmlPath)),
+                'url' => url('apps/tizen/sssp_config.xml')
+            ]
+        ];
+
+        return response()->view('tizen-directory', compact('files'))
+            ->header('Content-Type', 'text/html')
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
+    }
+
+    /**
+     * Serve the Tizen INNSTREAM.wgt file.
+     */
+    public function tizenViewer()
+    {
+        $viewerPath = public_path('tizen/INNSTREAM.wgt');
+        
+        if (!file_exists($viewerPath)) {
+            return response()->json([
+                'error' => 'INNSTREAM.wgt not found',
+                'message' => 'Please ensure INNSTREAM.wgt is placed in the public/tizen directory'
+            ], 404);
+        }
+
+        $fileContent = file_get_contents($viewerPath);
+        
+        return response($fileContent, 200, [
+            'Content-Type' => 'application/vnd.tizen.widget',
+            'Content-Disposition' => 'attachment; filename="INNSTREAM.wgt"',
+            'Content-Length' => strlen($fileContent),
+            'Cache-Control' => 'public, max-age=3600',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Accept, Authorization, X-Requested-With',
+        ]);
+    }
+
+    /**
+     * Serve the Tizen sssp_config.xml file.
+     */
+    public function tizenConfig()
+    {
+        $configPath = public_path('tizen/sssp_config.xml');
+        
+        if (!file_exists($configPath)) {
+            return response()->json([
+                'error' => 'sssp_config.xml not found',
+                'message' => 'Please ensure sssp_config.xml is placed in the public/tizen directory'
+            ], 404);
+        }
+
+        $response = response()->file($configPath);
+        
+        $response->headers->set('Content-Type', 'application/xml');
+        $response->headers->set('Cache-Control', 'public, max-age=3600');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
+        
+        return $response;
     }
 } 
