@@ -36,7 +36,8 @@ return new class extends Migration
             
             $table->index(['category', 'status']);
             $table->index(['type', 'status']);
-            $table->index('tags');
+            // Note: JSON columns like 'tags' cannot have regular indexes in MySQL
+            // Use JSON path indexes or generated columns if needed for searching
         });
 
         Schema::create('template_deployments', function (Blueprint $table) {
