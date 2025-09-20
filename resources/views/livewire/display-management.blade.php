@@ -49,11 +49,7 @@
                     <flux:subheading class="text-neutral-500 dark:text-neutral-400">{{ __('Total') }}</flux:subheading>
                     <flux:heading size="lg" class="mt-1 text-neutral-900 dark:text-neutral-100">{{ $this->stats['total'] }}</flux:heading>
                 </div>
-                <svg class="h-5 w-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                    </path>
-                </svg>
+                <img src="https://cdn.devdojo.com/tails/images/VFvAoIInEk7ph2OjAejKkW9BpNE8R1xsyI1MK4UH.png" class="w-18 h-18 object-cover object-center rounded-lg">
             </div>
         </div>
     </div>
@@ -150,13 +146,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div
-                                            class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/20">
-                                            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
+                                            class="flex h-10 w-10 items-center justify-center rounded-lg">
+                                            <img src="https://cdn.devdojo.com/tails/images/xdzOHV9YTcml7C3LNKEn19pPrwDoj1kv74UWpS6h.png" class="w-18 h-18 object-cover object-center rounded-lg">
                                         </div>
                                         <div class="ml-4">
                                             <flux:text class="text-sm font-medium">{{ $display->name }}</flux:text>

@@ -663,6 +663,35 @@ class TemplateController extends Controller
                     // Set scheduled time if provided
                     if ($scheduledAt) {
                         $deployment->update(['scheduled_at' => $scheduledAt]);
+                        
+                        // If scheduled for immediate deployment (within 1 minute), process it now
+                        if ($scheduledAt->diffInMinutes(now()) <= 1) {
+                            $deployment->update([
+                                'status' => 'deploying',
+                                'deployed_at' => now(),
+                            ]);
+                            
+                            // Update display's current template
+                            $display->update(['template_id' => $template->id]);
+                            
+                            // Mark deployment as active
+                            $deployment->update(['status' => 'active']);
+
+                            // Broadcast template update to display
+                            Log::info('Broadcasting immediate scheduled template update', [
+                                'display_id' => $display->id,
+                                'template_id' => $template->id,
+                                'action' => 'deploy',
+                            ]);
+                            
+                            $event = new \App\Events\TemplateUpdate($display, $template, 'deploy');
+                            broadcast($event);
+                            
+                            Log::info('Immediate scheduled template update broadcast sent', [
+                                'display_id' => $display->id,
+                                'template_id' => $template->id,
+                            ]);
+                        }
                     } else {
                         // Deploy immediately
                         $deployment->update([
